@@ -1,0 +1,14 @@
+
+@import "reset.css";
+@import "canvas.css";
+@import "../font/font.css";
+
+html,body {
+  height: 100%;
+  width: 100%;
+}
+
+html {
+  background-color: #ddd;
+  font-family: sans-serif;
+}
