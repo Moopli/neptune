@@ -29,12 +29,12 @@ function canvas_init() {
 
 function canvas_set_scale(scale) {
   prop.canvas.scale=scale;
-  canvas_resize();
+//  canvas_resize();
 }
 
 // resizes, takes into account canvas scale
 
-function canvas_resize() {
+function canvas_resize(recurse) {
   if(prop.canvas.resize) {
     prop.canvas.size.width=$(window).width()/prop.canvas.scale;
     prop.canvas.size.height=$(window).height()/prop.canvas.scale;
@@ -110,7 +110,7 @@ function canvas_clear(cc) {
 // background (sky)
 
 function canvas_draw_background(cc) {
-  cc.fillStyle=prop.style.ui.bg;
+  cc.fillStyle=prop.style.ui.fg;
   cc.fillRect(0,0,prop.canvas.size.width,prop.canvas.size.height);
 }
 
@@ -119,46 +119,75 @@ function canvas_draw_background(cc) {
 
 function canvas_draw_menu(cc) {
   var menu;
-  if(menu_is_open("start")) {
-    menu=prop.menu.start;
-  }
-  var align=Math.floor(text_width(cc,menu.title,align-pad,top,{
-    font:prop.font.ui,
-    style:"logo",
-    size:1,
-    align:"right baseline"
-  }));
-
-  var top=30;
-  var pad=10;
-  align+=pad*2;
-  text_draw(cc,menu.title,align-pad,top,{
+  var font=prop.font.ui;
+  if(menu_is_open())
+    menu=menu_current();
+  else
+    return;
+  cc.save();
+  if(prop.game.mode != "start" && prop.game.paused)
+    cc.globalAlpha=0.7;
+  cc.fillStyle=prop.style.ui.bg;
+  cc.fillRect(0,0,prop.canvas.size.width,prop.canvas.size.height);
+  cc.restore();
+  var width=text_width(cc,menu.title,align-pad,top,{
     font:prop.font.ui,
     style:"logo",
     size:1,
     align:"right baseline"
   });
+  var align=Math.floor(width);
+
+  var top=30;
+  var pad=10;
+  var compact=false;
+  align+=pad*2;
+  if(prop.canvas.size.width > 600) {
+    align=Math.floor(prop.canvas.size.width/2-30);
+  } else if(prop.canvas.size.width < 400) {
+    compact=true;
+    align=font.info.height;
+  }
+  var temp="right baseline";
+  var temp2=-pad;
+  if(compact) {
+    temp="left baseline";
+    temp2=pad;
+  }
+  text_draw(cc,menu.title,align+temp2,top,{
+    font:font,
+    style:"logo",
+    size:1,
+    align:temp
+  });
   var items=menu.items;
-  var line_height=Math.floor(prop.font.ui.info.line_height+6);
+  var line_height=Math.floor(font.info.line_height+6);
+  temp=0;
+  if(compact)
+    temp=line_height;
   for(var i=0;i<items.length;i++) {
     var item=items[i];
     cc.save();
-    cc.globalAlpha=crange(0,Math.abs(menu.selected-i),5,0.5,0.1);
-    if(menu.selected == i)
+    cc.globalAlpha=crange(0,Math.abs(menu.selected-i),5,0.4,0.075);
+    if(menu.selected == i) {
       cc.globalAlpha=1;
+    }
+    if(item.type() == "disabled") {
+      cc.globalAlpha=clamp(0.2,cc.globalAlpha*0.4,1);
+    }
     if(item.icon) {
-      text_draw_icon(cc,item.icon,Math.floor(align+pad/2),top+(line_height*i),{
-        font:prop.font.ui,
+      text_draw_icon(cc,item.icon,Math.floor(align+pad/2),top+(line_height*i)+temp,{
+        font:font,
         style:"white",
         size:1,
         align:"right baseline"
       });
     }
-    text_draw_button(cc,item.text,align+pad,top+(line_height*i),{
+    text_draw_button(cc,item.text,align+pad,top+(line_height*i)+temp,{
       selected:menu.selected==i,
       border:2,
       padding:3,
-      font:prop.font.ui,
+      font:font,
       style:"white",
       size:1,
       align:"left baseline"
@@ -177,15 +206,6 @@ function canvas_draw_menu(cc) {
 
 function canvas_draw_debug(cc) {
   var pad=3;
-  // debug
-  if(prop.input.keydown[prop.input.keysym.up]) {
-    text_draw(cc,"UP is DOWN",pad,pad,{
-      font:prop.font.ui,
-      style:"white",
-      size:1,
-      align:"left top"
-    });
-  }
   // version
   text_draw(cc,prop.version_string,prop.canvas.size.width-pad,pad,{
     font:prop.font.ui,
@@ -258,8 +278,8 @@ function canvas_update() {
     canvas_update_background();
   if(prop.canvas.dirty["menu"])
     canvas_update_menu();
-  if(!RELEASE) {
-    if(prop.time.frames % 10 == 0 || true)
+  if(RELEASE == false) {
+    if(prop.time.frames % 10 == 0)
       canvas_dirty("debug");
     if(prop.canvas.dirty["debug"])
       canvas_update_debug();

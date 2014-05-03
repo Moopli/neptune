@@ -16,10 +16,10 @@ var MODULES=[
   "load"
 ];
 
-// saved as prop.version
-var VERSION=[0,0,2];
+// saved as prop.version and prop.version_string
+var VERSION=[0,0,3];
 
-// use a main loop? (if you disable then reenable this, you must call update() afterwards)
+// are you using a main loop? (you must call update() afterward disable/reenable)
 var UPDATE=true;
 
 // the framerate is updated this often (seconds)

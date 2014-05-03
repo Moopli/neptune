@@ -129,3 +129,11 @@ function radians(degrees) {
 function choose(l) {
     return l[Math.floor(Math.random()*l.length)];
 }
+
+function mod(x,y) {
+  var z=x+0;
+  x=x%y;
+  if(x < 0)
+    x=(y-x)-2;
+  return x;
+}

@@ -18,6 +18,7 @@ function load_item_done() {
 function load_init() {
   canvas_add("load");
   requestAnimationFrame(load_frame);
+  canvas_resize();
 }
 
 function load_ready() {
@@ -34,7 +35,7 @@ function load_remove() {
 
 function load_fraction() {
   if(prop.load.items.total == 0)
-    return 1;
+    return 0;
   return prop.load.items.done/prop.load.items.total;
 }
 
@@ -54,8 +55,8 @@ function load_frame() {
     var width=Math.floor((prop.canvas.size.width*0.5)/2)*2; // make sure it's even
     var height=Math.max(Math.floor(width*0.05/2)*2,8); // height of inside bar
     var offset=[ // offset of outer border
-      prop.canvas.size.width/2-width/2-border*2,
-      prop.canvas.size.height/2-height/2-border*2
+      Math.floor(prop.canvas.size.width/2-width/2-border*2),
+      Math.floor(prop.canvas.size.height/2-height/2-border*2)
     ];
     // draw loading bar outer border
     cc.fillStyle=prop.style.ui.fg;

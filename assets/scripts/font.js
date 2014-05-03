@@ -111,7 +111,9 @@ function font_init() {
   prop.font.url="assets/data/fonts/";
 
   async("font");
-  font_load("ui");
+  setTimeout(function() {
+    font_load("ui");
+  },3000);
 }
 
 function font_load(name) {
