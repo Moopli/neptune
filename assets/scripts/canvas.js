@@ -167,6 +167,7 @@ function canvas_draw_menu(cc) {
   temp=0;
   if(compact)
     temp=line_height;
+  top+=temp;
   for(var i=0;i<items.length;i++) {
     var item=items[i];
     cc.save();
@@ -177,15 +178,20 @@ function canvas_draw_menu(cc) {
     if(item.type() == "disabled") {
       cc.globalAlpha=clamp(0.2,cc.globalAlpha*0.4,1);
     }
+    if(menu.selected == i) {
+      cc.globalAlpha=clamp(0,cc.globalAlpha*1.5,1);
+    }
+    if(item.gap)
+      top+=Math.floor(line_height/2);
     if(item.icon) {
-      text_draw_icon(cc,item.icon,Math.floor(align+pad/2),top+(line_height*i)+temp,{
+      text_draw_icon(cc,item.icon,Math.floor(align+pad/2),top,{
         font:font,
         style:"white",
         size:1,
         align:"right baseline"
       });
     }
-    text_draw_button(cc,item.text,align+pad,top+(line_height*i)+temp,{
+    text_draw_button(cc,item.text,align+pad,top,{
       selected:menu.selected==i,
       border:2,
       padding:3,
@@ -199,6 +205,7 @@ function canvas_draw_menu(cc) {
     } else {
 
     }
+    top+=line_height;
     cc.restore();
   }
   canvas_clean("menu");

@@ -113,23 +113,24 @@ function font_init() {
   async("font");
   setTimeout(function() {
     font_load("ui");
-  },3000);
+  },30);
 }
 
 function font_load(name) {
   var url=prop.font.url+name+".json";
   load_item_add();
-  $.getJSON(url)
-    .success(function(data) {
-      prop.font[name]=new Font(data);
-      async_loaded("font");
+  new Content({
+    url:url,
+    callback:function(status,data) {
+      if(status == "ok") {
+        prop.font[name]=new Font(data);
+      } else {
+        log(arguments,LOG_FATAL);
+      }
       load_item_done();
-    })
-    .error(function() {
-      log(arguments,LOG_FATAL);
       async_loaded("font");
-      load_item_done();
-    });
+    }
+  });
 }
 
 function font_update() {

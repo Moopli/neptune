@@ -4,11 +4,13 @@ var MenuItem=function(options) {
   this.icon=null;
   this.action=null; // function for call, Menu for submenu
   this.close=true;
+  this.gap=false;
   
   if(options) {
     if("text" in options) this.text=options.text;
     if("icon" in options) this.icon=options.icon;
     if("action" in options) this.action=options.action;
+    if("gap" in options) this.gap=options.gap;
     if("close" in options) this.close=options.close;
   }
 
@@ -44,12 +46,16 @@ var Menu=function(options) {
   this.nested=false; // if we're currently in a submenu, nested == true
   this.open=false;
   this.root=false;
+  this.save_position=true;
+  this.back=true;
 
   if(options) {
     if("title" in options) this.title=options.title;
     if("open" in options) this.open=options.open;
     if("items" in options) this.items=options.items;
     if("root" in options) this.root=options.root;
+    if("save_position" in options) this.save_position=options.save_position;
+    if("back" in options) this.back=options.back;
   }
 
   this.close=function() {
@@ -57,13 +63,17 @@ var Menu=function(options) {
       this.items[this.selected].action.close();
     this.nested=false;
     this.open=false;
+    if(!this.save_position)
+      this.selected=0;
   };
 
-  if(!this.root && false) {
+  if(!this.root && this.back == true) {
     this.items.push(new MenuItem({
       text:"Back",
       icon:"back",
-      action:setTimeout(function() {menu_back()},1000)
+      close:false,
+      gap:true,
+      action:menu_back
     }));
   }
 
@@ -86,6 +96,8 @@ var Menu=function(options) {
 
   this.back=function() {
     if(this.nested == false) { // we're in the end of the submenu chain
+      if(!this.save_position)
+        this.selected=0;
       return true;
     } else {
       if(this.items[this.selected].action.back() == true) {
@@ -129,6 +141,7 @@ function menu_init() {
 
   prop.menu.pause=new Menu({
     title:"Paused",
+    save_position:false,
     root:true,
     items:[
       new MenuItem({
@@ -155,8 +168,25 @@ function menu_init() {
       }),
       new MenuItem({
         text:"End game",
-        icon:"end",
-        action:game_end
+        icon:"no",
+        action:new Menu({
+          title:"Really end game?",
+          save_position:false,
+          back:false,
+          items:[
+            new MenuItem({
+              text:"No",
+              icon:"no",
+              close:false,
+              action:menu_back
+            }),
+            new MenuItem({
+              text:"Yes",
+              icon:"yes",
+              action:game_end
+            })
+          ]
+        })
       }),
     ]
   });
