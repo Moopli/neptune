@@ -9,6 +9,8 @@ function canvas_pre() {
   // resize canvas to fit window?
   prop.canvas.resize=true;
   prop.canvas.scale=2;
+  if($(window).width() < 400)
+    prop.canvas.scale=1;
   prop.canvas.size={ // all canvases are the same size
     height:480,
     width:640
@@ -143,7 +145,7 @@ function canvas_draw_menu(cc) {
   var compact=false;
   align+=pad*2;
   if(prop.canvas.size.width > 600) {
-    align=Math.floor(prop.canvas.size.width/2-30);
+    align=Math.floor(prop.canvas.size.width/2-font.info.height*10);
   } else if(prop.canvas.size.width < 400) {
     compact=true;
     align=font.info.height;

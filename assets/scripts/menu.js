@@ -68,8 +68,11 @@ var Menu=function(options) {
   }
 
   this.clampSelected=function() {
-//    this.selected=clamp(0,this.selected,this.items.length-1);
-    this.selected=mod(this.selected,this.items.length);
+    var loop=false;
+    if(loop)
+      this.selected=mod(this.selected,this.items.length);
+    else
+      this.selected=clamp(0,this.selected,this.items.length-1);
   };
 
   this.move=function(direction) {
@@ -119,7 +122,7 @@ function menu_init() {
     title:"Settings",
     items:[
       new MenuItem({
-        text:"There's nothing here.",
+        text:"No settings yet.",
       }),
     ]
   });
