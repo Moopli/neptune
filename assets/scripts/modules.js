@@ -6,10 +6,12 @@ var MODULES=[
   "-util",
   "-animation",
   "style",
-//  "asset",
-  "menu",
   "font",
   "text",
+//  "asset",
+  "input",
+  "game",
+  "menu",
   "canvas",
   "load"
 ];

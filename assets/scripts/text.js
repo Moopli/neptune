@@ -32,6 +32,28 @@ function text_draw_ll(cc,text,x,y,options) {
   return offset;
 }
 
+function text_draw_icon(cc,icon,x,y,options) {
+  var align=options.align;
+  var font=options.font;
+  var style=options.style;
+  var size=options.size;
+
+  if(!align) align="left baseline";
+  if(!font) font=prop.font.ui;
+  if(!style) style="debug";
+  if(!size) size=1;
+
+  options.align=align;
+  var width=font.getGlyph(icon);
+  if(width)
+    width=width.width; // lol
+  else
+    width=0;
+  var offset=text_align(cc,width,x,y,options);
+
+  return text_draw_char(cc,icon,x+offset[0],y+offset[1],font,style,size);
+}
+
 function text_width(cc,text,x,y,options) {
   return text_draw_ll(null,text,x,y,options);
 }
@@ -66,7 +88,10 @@ function text_align(cc,text,x,y,options) {
 
   var xalign=align[0];
   var yalign=align[1];
-  var width=text_width(cc,text,x,y,options);
+  if(typeof text == typeof "")
+    var width=text_width(cc,text,x,y,options);
+  else
+    var width=text;
   var font=options.font;
 
   var offset=[0,0];
@@ -99,14 +124,17 @@ function text_draw(cc,text,x,y,options) {
 }
 
 function text_draw_button(cc,text,x,y,options) {
+  cc.save();
 
   var padding=options.padding;
   var border=options.border;
   var selected=options.selected;
+  var button_style=options.button_style;
 
   if(!padding) padding=2;
   if(!border) border=2;
   if(!selected) selected=false;
+  if(!button_style) button_style="menu";
 
   var width=text_width(cc,text,x,y,options);
   var height=text_baseline_height(cc,text,x,y,options);
@@ -122,26 +150,30 @@ function text_draw_button(cc,text,x,y,options) {
   width+=padding*2+border*2;
   height+=padding*2+border*2;
 
-  cc.fillStyle=prop.style.ui.fg;
-  cc.fillRect(offset[0],offset[1],width,height);
+  if(button_style == "menu") {
+    width=border;
+    offset[1]+=border;
+    height-=border*2;
+  }
 
-  if(!selected) {
-    cc.fillStyle=prop.style.ui.bg;
-    cc.fillRect(offset[0]+border,offset[1]+border,width-border*2,height-border*2);
+  if(selected && button_style != "menu") {
+    cc.fillStyle=prop.style.ui.fg;
+    cc.fillRect(offset[0],offset[1],width,height);
+
+    if(button_style != "menu") {
+      cc.fillStyle=prop.style.ui.bg;
+      cc.fillRect(offset[0]+border,offset[1]+border,width-border*2,height-border*2);
+    }
   }
   
   var style=options.style;
   if(!style) style="debug";
 
-  if(selected) {
-    if(style == "white")
-      style="black";
-    else if(style == "black")
-      style="white";
-  }
   options.style=style;
   text_draw(cc,text,x,y,options);
 
   var bounds=[offset[0],offset[1],width,height];
+  cc.restore();
   return bounds;
 }
+

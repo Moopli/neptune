@@ -42,6 +42,12 @@ var Font=function(options) {
         var cb=Math.floor(Math.random()*255);
         cc.fillStyle="rgb("+[cr,cg,cb].join(",")+")";
       }
+      if(style == "logo") {
+        var cr=Math.floor(trange(0,Math.random(),1,90,140));
+        var cg=Math.floor(clamp(0,cr*1.3,255));
+        var cb=Math.floor(clamp(0,cr*3,255));
+        cc.fillStyle="rgb("+[cr,cg,cb].join(",")+")";
+      }
       if(g[i] == "#") {
         cc.fillRect(x,y,1,1);
       }
@@ -93,6 +99,7 @@ var Font=function(options) {
     if(!RELEASE) this.render("debug");
     this.render("white");
     this.render("black");
+    this.render("logo");
   };
 
   this.generate();

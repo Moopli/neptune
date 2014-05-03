@@ -57,6 +57,17 @@ function canvas_dirty(name) {
   }
 }
 
+// cleans <name>
+
+function canvas_clean(name) {
+  if(name && name != "*") {
+    prop.canvas.dirty[name]=false;
+  } else {
+    for(var i in prop.canvas.dirty)
+      prop.canvas.dirty[i]=false;
+  }
+}
+
 // adds a canvas to the canvas list
 
 function canvas_add(name) {
@@ -105,24 +116,76 @@ function canvas_draw_background(cc) {
 
 // menu
 
+
 function canvas_draw_menu(cc) {
-  cc.fillStyle=prop.style.ui.bg;
-  cc.fillRect(0,0,prop.canvas.size.width,prop.canvas.size.height);
-  var middle=Math.floor(prop.canvas.size.width/2);
-  text_draw_button(cc,"NEPTUNE",middle,20,{
-    selected:true,
-    padding:3,
+  var menu;
+  if(menu_is_open("start")) {
+    menu=prop.menu.start;
+  }
+  var align=Math.floor(text_width(cc,menu.title,align-pad,top,{
     font:prop.font.ui,
-    style:"white",
-    size:2,
-    align:"center top"
+    style:"logo",
+    size:1,
+    align:"right baseline"
+  }));
+
+  var top=30;
+  var pad=10;
+  align+=pad*2;
+  text_draw(cc,menu.title,align-pad,top,{
+    font:prop.font.ui,
+    style:"logo",
+    size:1,
+    align:"right baseline"
   });
+  var items=menu.items;
+  var line_height=Math.floor(prop.font.ui.info.line_height+6);
+  for(var i=0;i<items.length;i++) {
+    var item=items[i];
+    cc.save();
+    cc.globalAlpha=crange(0,Math.abs(menu.selected-i),5,0.5,0.1);
+    if(menu.selected == i)
+      cc.globalAlpha=1;
+    if(item.icon) {
+      text_draw_icon(cc,item.icon,Math.floor(align+pad/2),top+(line_height*i),{
+        font:prop.font.ui,
+        style:"white",
+        size:1,
+        align:"right baseline"
+      });
+    }
+    text_draw_button(cc,item.text,align+pad,top+(line_height*i),{
+      selected:menu.selected==i,
+      border:2,
+      padding:3,
+      font:prop.font.ui,
+      style:"white",
+      size:1,
+      align:"left baseline"
+    });
+    if(item.type() == "function") {
+      
+    } else {
+
+    }
+    cc.restore();
+  }
+  canvas_clean("menu");
 }
 
 // debug overlay
 
 function canvas_draw_debug(cc) {
   var pad=3;
+  // debug
+  if(prop.input.keydown[prop.input.keysym.up]) {
+    text_draw(cc,"UP is DOWN",pad,pad,{
+      font:prop.font.ui,
+      style:"white",
+      size:1,
+      align:"left top"
+    });
+  }
   // version
   text_draw(cc,prop.version_string,prop.canvas.size.width-pad,pad,{
     font:prop.font.ui,
@@ -159,7 +222,7 @@ function canvas_update_background() {
 //  canvas_clear(cc);
   canvas_draw_background(cc);
   cc.restore();
-  prop.canvas.dirty["background"]=false;
+  canvas_clean("background");
 }
 
 // menu
@@ -183,7 +246,7 @@ function canvas_update_debug() {
   cc.scale(prop.canvas.scale,prop.canvas.scale);
   canvas_clear(cc);
   canvas_draw_debug(cc);
-  prop.canvas.dirty["debug"]=false;
+  canvas_clean("debug");
   cc.restore();
 }
 
@@ -196,7 +259,7 @@ function canvas_update() {
   if(prop.canvas.dirty["menu"])
     canvas_update_menu();
   if(!RELEASE) {
-    if(prop.time.frames % 10 == 0)
+    if(prop.time.frames % 10 == 0 || true)
       canvas_dirty("debug");
     if(prop.canvas.dirty["debug"])
       canvas_update_debug();
