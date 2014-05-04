@@ -239,10 +239,13 @@ function canvas_draw_menu(cc) {
 
 function canvas_draw_debug(cc) {
   var pad=3;
+  var style="white";
+  if(game_mode() == "game" && !game_paused())
+    style="black";
   // version
   text_draw(cc,prop.version_string,prop.canvas.size.width-pad,pad,{
     font:prop.font.ui,
-    style:"white",
+    style:style,
     size:1,
     align:"right top"
   });
@@ -250,7 +253,7 @@ function canvas_draw_debug(cc) {
   text_draw(cc,Math.floor(prop.time.fps).toString()+" fps",
             prop.canvas.size.width-pad,prop.canvas.size.height-pad,{
     font:prop.font.ui,
-    style:"white",
+    style:style,
     size:1,
     align:"right baseline"
   });
@@ -258,7 +261,7 @@ function canvas_draw_debug(cc) {
   text_draw(cc,Math.floor(prop.time.frame.delta*1000).toString()+"ms",
             pad,prop.canvas.size.height-pad,{
     font:prop.font.ui,
-    style:"white",
+    style:style,
     size:1,
     align:"left baseline"
   });
@@ -285,7 +288,7 @@ function canvas_update_map() {
   cc.save();
   canvas_clear(cc);
   cc.scale(prop.canvas.scale,prop.canvas.scale);
-  cc.translate(Math.floor(prop.ui.pan[0]*prop.map.block.size),
+  cc.translate(Math.floor(-prop.ui.pan[0]*prop.map.block.size),
                Math.floor(prop.ui.pan[1]*prop.map.block.size));
   canvas_draw_map(cc);
   cc.restore();

@@ -9,6 +9,18 @@
       "url":"dirt/top.png",
       "frames":4
     },
+    "bottom":{
+      "url":"dirt/bottom.png",
+      "frames":4
+    },
+    "left":{
+      "url":"dirt/left.png",
+      "frames":4
+    },
+    "right":{
+      "url":"dirt/right.png",
+      "frames":4
+    },
     "top-left-outside":{
       "url":"dirt/top-left-outside.png",
       "frames":4

@@ -12,8 +12,18 @@ var Block=function(options) {
     rock:[]
   };
 
+  this.sides.bottom={
+    dirt:["air"],
+    rock:[]
+  };
+
   this.sides.left={
-    dirt:[],
+    dirt:["air"],
+    rock:[]
+  };
+
+  this.sides.right={
+    dirt:["air"],
     rock:[]
   };
 
@@ -43,15 +53,38 @@ var Block=function(options) {
     if("map" in options) this.map=options.map;
   }
 
+  this.rand=function() {
+    return rand();
+    var x=this.pos[0];
+    var y=this.pos[1];
+    return clamp(0,(x%8+y%8)/4,1);
+  };
+
+  this.chance=function() {
+    return (this.rand() >= 0.5);
+  };
+
   this.pickStyle=function() {
     this.style={};
     var rotate="no";
     var frames={};
+    var flip={};
 
     if(this.type == "dirt") {
       rotate="all";
+
       frames.center=4;
       frames.top=4;
+      frames.bottom=4;
+      frames.left=4;
+      frames.right=4;
+
+      flip.center="no";
+      flip.top="horizontal";
+      flip.bottom="horizontal";
+      flip.left="vertical";
+      flip.right="vertical";
+
       frames.top_left_outside=4;
       frames.top_right_outside=4;
       frames.top_left_inside=4;
@@ -60,34 +93,50 @@ var Block=function(options) {
       rotate="180";
       frames.center=4;
       frames.top=4;
+      frames.left=4;
+      frames.right=4;
       frames.top_left_outside=4;
       frames.top_left_inside=4;
       frames.top_right_inside=4;
     }
 
     this.style.center={};
-    this.style.center.frame=floor(rand()*frames.center);
+    this.style.center.frame=floor(this.rand()*frames.center);
+    this.style.center.flip=flip.center;
 
     this.style.top={};
-    this.style.top.frame=floor(rand()*frames.top);
+    this.style.top.frame=floor(this.rand()*frames.top);
+    this.style.top.flip=flip.top;
+
+    this.style.bottom={};
+    this.style.bottom.frame=floor(this.rand()*frames.bottom);
+    this.style.bottom.flip=flip.bottom;
+
+    this.style.left={};
+    this.style.left.frame=floor(this.rand()*frames.left);
+    this.style.left.flip=flip.left;
+
+    this.style.right={};
+    this.style.right.frame=floor(this.rand()*frames.right);
+    this.style.right.flip=flip.right;
 
     this.style.top_left_outside={};
-    this.style.top_left_outside.frame=floor(rand()*frames.top_left_outside);
+    this.style.top_left_outside.frame=floor(this.rand()*frames.top_left_outside);
 
     this.style.top_right_outside={};
-    this.style.top_right_outside.frame=floor(rand()*frames.top_right_outside);
+    this.style.top_right_outside.frame=floor(this.rand()*frames.top_right_outside);
 
     this.style.top_left_inside={};
-    this.style.top_left_inside.frame=floor(rand()*frames.top_left_inside);
+    this.style.top_left_inside.frame=floor(this.rand()*frames.top_left_inside);
 
     this.style.top_right_inside={};
-    this.style.top_right_inside.frame=floor(rand()*frames.top_right_inside);
+    this.style.top_right_inside.frame=floor(this.rand()*frames.top_right_inside);
 
     this.style.center.angle=0;
     if(rotate == "all")
-      this.style.center.angle=floor(rand()*4)/4*Math.PI*2;
+      this.style.center.angle=floor(rand()*4);
     else if(rotate == "180")
-      this.style.center.angle=floor(rand()*2)/2*Math.PI*2;
+      this.style.center.angle=floor(rand()*2)*2;
   };
 
   this.drawCenter=function(cc,sprite) {
@@ -97,6 +146,21 @@ var Block=function(options) {
   this.drawTop=function(cc,sprite) {
     var bs=prop.map.block.size;
     sprite.drawFrame(cc,0,-floor(bs*0.5),this.style.top.frame,"top");
+  };
+
+  this.drawBottom=function(cc,sprite) {
+    var bs=prop.map.block.size;
+    sprite.drawFrame(cc,0,floor(bs*0.5),this.style.bottom.frame,"bottom");
+  };
+
+  this.drawLeft=function(cc,sprite) {
+    var bs=prop.map.block.size;
+    sprite.drawFrame(cc,-floor(bs*0.5),0,this.style.top.frame,"left");
+  };
+
+  this.drawRight=function(cc,sprite) {
+    var bs=prop.map.block.size;
+    sprite.drawFrame(cc,floor(bs*0.5),0,this.style.top.frame,"right");
   };
 
   this.drawTopLeftOutside=function(cc,sprite) {
@@ -123,8 +187,7 @@ var Block=function(options) {
                      this.style.top_left_inside.frame,"top-right-inside");
   };
 
-  this.render=function(cc,center) {
-    this.pickStyle();
+  this.render=function(cc,mode) {
 
     var bs=prop.map.block.size;
     var sprite=null;
@@ -141,17 +204,20 @@ var Block=function(options) {
     cc.save();
     cc.translate(x*bs,-y*bs);
     
-    if(center) {
+    if(mode == "center") {
       cc.save()
       cc.translate(bs/2,bs/2);
-      cc.rotate(this.style.center_angle);
+      cc.rotate(this.style.center.angle/4*Math.PI2);
       cc.translate(-bs/2,-bs/2);
       this.drawCenter(cc,sprite);
       cc.restore();
-    } else {
+    } else if(mode == "edge" || mode == "corner") {
 
       var temp_block=this.map.getBlock(x,y+1); // above
       var top_type=(temp_block?temp_block.type:"air");
+
+      temp_block=this.map.getBlock(x,y-1); // above
+      var bottom_type=(temp_block?temp_block.type:"air");
 
       temp_block=this.map.getBlock(x-1,y); // left
       var left_type=(temp_block?temp_block.type:"air");
@@ -166,7 +232,9 @@ var Block=function(options) {
       var top_right_type=(temp_block?temp_block.type:"air");
 
       var top=contains(this.sides.top[this.type],top_type);
+      var bottom=contains(this.sides.bottom[this.type],bottom_type);
       var left=contains(this.sides.left[this.type],left_type);
+      var right=contains(this.sides.right[this.type],right_type);
 
       var top_left_outside=(contains(this.sides.top_left_outside[this.type],top_type) &&
                             contains(this.sides.top_left_outside[this.type],left_type));
@@ -177,16 +245,62 @@ var Block=function(options) {
       var top_right_inside=(contains(this.sides.top_right_inside[this.type],top_type) &&
                             !contains(this.sides.top_right_inside[this.type],top_right_type));
 
-      if(top)
-        this.drawTop(cc,sprite);
-      if(top_left_outside)
-        this.drawTopLeftOutside(cc,sprite);
-      if(top_right_outside)
-        this.drawTopRightOutside(cc,sprite);
-      if(top_left_inside)
-        this.drawTopLeftInside(cc,sprite);
-      if(top_right_inside)
-        this.drawTopRightInside(cc,sprite);
+      if(mode == "edge") {
+        if(top) {
+          cc.save()
+          cc.translate(bs/2,bs/2);
+          if(this.style.top.flip == "horizontal" && this.chance())
+            cc.scale(-1,1);
+          else if(this.style.top.flip == "vertical" && this.chance())
+            cc.scale(1,-1);
+          cc.translate(-bs/2,-bs/2);
+          this.drawTop(cc,sprite);
+          cc.restore();
+        }
+        if(bottom) {
+          cc.save()
+          cc.translate(bs/2,bs/2);
+          if(this.style.bottom.flip == "horizontal" && this.chance())
+            cc.scale(-1,1);
+          else if(this.style.bottom.flip == "vertical" && this.chance())
+            cc.scale(1,-1);
+          cc.translate(-bs/2,-bs/2);
+          this.drawBottom(cc,sprite);
+          cc.restore();
+        }
+        if(left) {
+          cc.save()
+          cc.translate(bs/2,bs/2);
+          if(this.style.left.flip == "horizontal" && this.chance())
+            cc.scale(-1,1);
+          else if(this.style.left.flip == "vertical" && this.chance())
+            cc.scale(1,-1);
+          cc.translate(-bs/2,-bs/2);
+          this.drawLeft(cc,sprite);
+          cc.restore();
+        }
+        if(right) {
+          cc.save()
+          cc.translate(bs/2,bs/2);
+          if(this.style.right.flip == "horizontal" && this.chance())
+            cc.scale(-1,1);
+          else if(this.style.right.flip == "vertical" && this.chance())
+            cc.scale(1,-1);
+          cc.translate(-bs/2,-bs/2);
+          this.drawRight(cc,sprite);
+          cc.restore();
+        }
+      }
+      if(mode == "corner") {
+        if(top_left_outside)
+          this.drawTopLeftOutside(cc,sprite);
+        if(top_right_outside)
+          this.drawTopRightOutside(cc,sprite);
+        if(top_left_inside)
+          this.drawTopLeftInside(cc,sprite);
+        if(top_right_inside)
+          this.drawTopRightInside(cc,sprite);
+      }
     }
 
     cc.restore();
@@ -278,19 +392,24 @@ var Map=function(data) {
       map:this,
       pos:[x,y]
     });
-    this.bounds[0]=Math.min(this.bounds[0],x-1);
-    this.bounds[1]=Math.min(this.bounds[1],y-1);
+    this.bounds[0]=Math.min(this.bounds[0],x-2);
+    this.bounds[1]=Math.min(this.bounds[1],y-2);
 
-    this.bounds[2]=Math.max(this.bounds[2],x+1);
-    this.bounds[3]=Math.max(this.bounds[3],y+1);
+    this.bounds[2]=Math.max(this.bounds[2],x+4);
+    this.bounds[3]=Math.max(this.bounds[3],y+4);
   };
 
   this.renderBlockCenter=function(block) {
-    block.render(this.canvas,true);
+    block.pickStyle();
+    block.render(this.canvas,"center");
   };
 
-  this.renderBlock=function(block) {
-    block.render(this.canvas,false);
+  this.renderBlockEdges=function(block) {
+    block.render(this.canvas,"edge");
+  };
+
+  this.renderBlockCorners=function(block) {
+    block.render(this.canvas,"corner");
   };
 
   this.render=function() {
@@ -308,7 +427,11 @@ var Map=function(data) {
     }
     for(var i in this.blocks) {
       var block=this.blocks[i];
-      this.renderBlock(block);
+      this.renderBlockEdges(block);
+    }
+    for(var i in this.blocks) {
+      var block=this.blocks[i];
+      this.renderBlockCorners(block);
     }
   };
   

@@ -149,3 +149,5 @@ function mod(x,y) {
 function contains(list,value) {
   return list.indexOf(value) >= 0;
 }
+
+Math.PI2=Math.PI*2;
