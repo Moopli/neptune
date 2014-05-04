@@ -22,6 +22,7 @@ function canvas_pre() {
 
 function canvas_init() {
   canvas_add("background");
+  canvas_add("map");
   canvas_add("menu");
   if(RELEASE == false)
     canvas_add("debug");
@@ -31,7 +32,7 @@ function canvas_init() {
 
 function canvas_set_scale(scale) {
   prop.canvas.scale=scale;
-//  canvas_resize();
+  canvas_resize();
 }
 
 // resizes, takes into account canvas scale
@@ -73,16 +74,19 @@ function canvas_clean(name) {
 // adds a canvas to the canvas list
 
 function canvas_add(name) {
+  canvas_remove(name);
   $("#canvases").append("<canvas id='"+name+"-canvas'></canvas>");
   prop.canvas.contexts[name]=$("#"+name+"-canvas").get(0).getContext("2d");
   canvas_dirty(name);
+  return prop.canvas.contexts[name];
 }
 
 // adds a canvas and hides it
 
 function canvas_add_offscreen(name) {
-  canvas_add(name);
+  var cc=canvas_add(name);
   $(prop.canvas.contexts[name].canvas).css("display","none");
+  return cc;
 }
 
 // removes a canvas
@@ -101,7 +105,7 @@ function canvas_get(name) {
 // clears the __VIRTUAL__ canvas (if scale is two, it will clear the upper left corner only.)
 
 function canvas_clear(cc) {
-  cc.clearRect(0,0,prop.canvas.size.width,prop.canvas.size.height);
+  cc.clearRect(0,0,cc.canvas.width,cc.canvas.height);
   cc.webkitImageSmoothingEnabled=false;
   cc.mozImageSmoothingEnabled=false;
   cc.imageSmoothingEnabled=false;
@@ -112,12 +116,49 @@ function canvas_clear(cc) {
 // background (sky)
 
 function canvas_draw_background(cc) {
-  cc.fillStyle=prop.style.ui.fg;
+  cc.fillStyle=prop.style.sky;
   cc.fillRect(0,0,prop.canvas.size.width,prop.canvas.size.height);
 }
 
-// menu
+// map
 
+function canvas_draw_block(cc,block) {
+  var bs=prop.map.block.size;
+  var sprite=sprite_get("block","dirt");
+  sprite.drawFrame(cc,0,0,block.style.center,"center");
+}
+
+function canvas_draw_map(cc) {
+  if(game_mode() != "game")
+    return;
+  var map=map_current();
+  var bs=prop.map.block.size;
+//  cc.drawImage(map.canvas.canvas,-map.bounds[0]*bs,-map.bounds[1]*bs);
+  cc.drawImage(map.canvas.canvas,0,0);
+  return;
+
+  var viewport=ui_viewport();
+  var map=map_current();
+  if(!map)
+    return;
+  var i=0;
+  var bs=prop.map.block.size*prop.canvas.scale;
+  for(var x=viewport[0];x<viewport[2];x++) {
+    for(var y=viewport[1];y<viewport[3];y++) {
+      var block=map.getBlock(x,y);
+      if(!block)
+        continue;
+      cc.save();
+      cc.translate(x*bs,-y*bs);
+      canvas_draw_block(cc,block);
+      cc.restore();
+      i++;
+    }
+  }
+//  console.log(i);
+}
+
+// menu
 
 function canvas_draw_menu(cc) {
   var menu;
@@ -127,8 +168,8 @@ function canvas_draw_menu(cc) {
   else
     return;
   cc.save();
-  if(prop.game.mode != "start" && prop.game.paused)
-    cc.globalAlpha=0.7;
+  if(game_mode() != "start" && game_paused())
+    cc.globalAlpha=0.9;
   cc.fillStyle=prop.style.ui.bg;
   cc.fillRect(0,0,prop.canvas.size.width,prop.canvas.size.height);
   cc.restore();
@@ -152,18 +193,25 @@ function canvas_draw_menu(cc) {
   }
   var temp="right baseline";
   var temp2=-pad;
+  var items=menu.items;
+  var line_height=Math.floor(font.info.line_height+6);
   if(compact) {
     temp="left baseline";
     temp2=pad;
   }
-  text_draw(cc,menu.title,align+temp2,top,{
+  var temp3=top;
+  if(line_height*items.length+top+pad*2 > prop.canvas.size.height) {
+    top-=Math.floor(line_height*menu.selected);
+    if(compact) {
+      temp3=top;
+    }
+  }
+  text_draw(cc,menu.title,align+temp2,temp3,{
     font:font,
     style:"logo",
     size:1,
     align:temp
   });
-  var items=menu.items;
-  var line_height=Math.floor(font.info.line_height+6);
   temp=0;
   if(compact)
     temp=line_height;
@@ -171,16 +219,17 @@ function canvas_draw_menu(cc) {
   for(var i=0;i<items.length;i++) {
     var item=items[i];
     cc.save();
-    cc.globalAlpha=crange(0,Math.abs(menu.selected-i),5,0.4,0.075);
+    cc.globalAlpha=crange(0,Math.abs(menu.selected-i),5,0.5,0.3);
     if(menu.selected == i) {
       cc.globalAlpha=1;
     }
     if(item.type() == "disabled") {
-      cc.globalAlpha=clamp(0.2,cc.globalAlpha*0.4,1);
+      cc.globalAlpha=clamp(0.3,cc.globalAlpha*0.4,1);
     }
     if(menu.selected == i) {
       cc.globalAlpha=clamp(0,cc.globalAlpha*1.5,1);
     }
+    cc.globalAlpha=clamp(0.3,cc.globalAlpha,1);
     if(item.gap)
       top+=Math.floor(line_height/2);
     if(item.icon) {
@@ -254,13 +303,27 @@ function canvas_update_background() {
   canvas_clean("background");
 }
 
+// map
+
+function canvas_update_map() {
+  var cc=canvas_get("map");
+  cc.save();
+  canvas_clear(cc);
+  cc.scale(prop.canvas.scale,prop.canvas.scale);
+  cc.translate(Math.floor(prop.ui.pan[0]*prop.map.block.size),
+               Math.floor(prop.ui.pan[1]*prop.map.block.size));
+  canvas_draw_map(cc);
+  cc.restore();
+  canvas_clean("map");
+}
+
 // menu
 
 function canvas_update_menu() {
   var cc=canvas_get("menu");
   cc.save();
-  cc.scale(prop.canvas.scale,prop.canvas.scale);
   canvas_clear(cc);
+  cc.scale(prop.canvas.scale,prop.canvas.scale);
   canvas_draw_menu(cc);
   cc.restore();
 }
@@ -272,8 +335,8 @@ function canvas_update_debug() {
     return;
   var cc=canvas_get("debug");
   cc.save();
-  cc.scale(prop.canvas.scale,prop.canvas.scale);
   canvas_clear(cc);
+  cc.scale(prop.canvas.scale,prop.canvas.scale);
   canvas_draw_debug(cc);
   canvas_clean("debug");
   cc.restore();
@@ -285,6 +348,8 @@ function canvas_update() {
 //  canvas_set_scale(trange(-1,Math.sin(time()*4),1,1,3));
   if(prop.canvas.dirty["background"])
     canvas_update_background();
+  if(prop.canvas.dirty["map"])
+    canvas_update_map();
   if(prop.canvas.dirty["menu"])
     canvas_update_menu();
   if(RELEASE == false) {

@@ -7,6 +7,8 @@ function load_pre() {
   prop.load.items.done=0;
 }
 
+var load_start=load_pre;
+
 function load_item_add() {
   prop.load.items.total+=1;
 }
@@ -66,6 +68,7 @@ function load_frame() {
     cc.fillRect(offset[0]+border,offset[1]+border,width+border*2,height+border*2);
     // calculate width
     width*=load_fraction();
+    width=Math.floor(width);
     // draw loading bar
     cc.fillStyle=prop.style.ui.fg;
     cc.fillRect(offset[0]+border*2,offset[1]+border*2,width,height);

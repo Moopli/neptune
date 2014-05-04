@@ -7,4 +7,6 @@ function style_init() {
   prop.style.ui.fg="#fff";
   prop.style.ui.accent="#38f";
 
+  prop.style.sky="#bdf";
+
 }

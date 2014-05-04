@@ -1,0 +1,13 @@
+{
+  "type":"derivatives",
+  "images":{
+    "center":{
+      "url":"dirt/center.png",
+      "frames":4
+    },
+    "top":{
+      "url":"dirt/top.png",
+      "frames":2
+    }
+  }
+}

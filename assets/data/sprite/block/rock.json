@@ -1,0 +1,10 @@
+{
+  "type":"derivatives",
+  "frames":4,
+  "images":{
+    "center":{
+      "url":"rock/center.png",
+      "frames":4
+    }
+  }
+}

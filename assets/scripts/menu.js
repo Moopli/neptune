@@ -248,7 +248,7 @@ function menu_init() {
               icon:"music"
             }),
             new MenuItem({
-              text:"Software by Jon Ross",
+              text:"Software and art by Jon Ross",
               icon:"software"
             }),
           ]
@@ -260,17 +260,17 @@ function menu_init() {
 }
 
 function menu_current() { // returns the TOPMOST menu.
-  if(prop.game.mode == "start")
+  if(game_mode() == "start")
     return prop.menu.start.getCurrentMenu();
-  else if(prop.game.paused)
+  else if(game_paused())
     return prop.menu.pause.getCurrentMenu();
 }
 
 function menu_back() {
   var end;
-  if(prop.game.mode == "start")
+  if(game_mode() == "start")
     end=prop.menu.start.back();
-  else if(prop.game.paused)
+  else if(game_paused())
     end=prop.menu.pause.back();
   if(end)
     menu_close("*");
@@ -282,9 +282,9 @@ function menu_close(name) {
     prop.menu.start.close();
     prop.menu.pause.close();
   }
-  if(prop.game.mode == "start")
+  if(game_mode() == "start")
     prop.menu.start.open=true;
-  else if(prop.game.paused)
+  else if(game_paused())
     game_unpause();
   canvas_dirty("menu");
 }
@@ -307,12 +307,12 @@ function menu_is_open(name) {
     }
   } else {
     if(name == "start") {
-      if(prop.game.mode == "start")
+      if(game_mode() == "start")
         return true;
       return false;
     }
     if(name == "pause") {
-      if(prop.game.paused)
+      if(game_paused())
         return true;
       return false;
     }

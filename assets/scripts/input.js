@@ -22,17 +22,16 @@ function input_init() {
   };
 }
 
-function input_done() {
-
+function input_ready() {
   $(window).keydown(function(e) {
     prop.input.keys[e.which]+=1;
     input_keydown(e.which);
     return true;
   });
-
+  
   $(window).keyup(function(e) {
     prop.input.keys[e.which]=0;
-//    log(e.which,LOG_DEBUG);
+    //    log(e.which,LOG_DEBUG);
     return true;
   });
 

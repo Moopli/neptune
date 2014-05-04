@@ -43,9 +43,10 @@ var Font=function(options) {
         cc.fillStyle="rgb("+[cr,cg,cb].join(",")+")";
       }
       if(style == "logo") {
-        var cr=Math.floor(trange(0,Math.random(),1,90,140));
-        var cg=Math.floor(clamp(0,cr*1.3,255));
-        var cb=Math.floor(clamp(0,cr*3,255));
+        var c=trange(0,Math.random(),1,180,255);
+        var cb=Math.floor(crange(0,c,255,0,240,255));
+        var cg=Math.floor(crange(0,c,255,0,160,180));
+        var cr=Math.floor(crange(0,c,255,0,80,100));
         cc.fillStyle="rgb("+[cr,cg,cb].join(",")+")";
       }
       if(g[i] == "#") {
@@ -110,15 +111,13 @@ function font_init() {
   prop.font={};
   prop.font.url="assets/data/fonts/";
 
-  async("font");
-  setTimeout(function() {
-    font_load("ui");
-  },30);
+  font_load("ui");
+  
 }
 
 function font_load(name) {
   var url=prop.font.url+name+".json";
-  load_item_add();
+  async("font");
   new Content({
     url:url,
     callback:function(status,data) {
@@ -127,7 +126,6 @@ function font_load(name) {
       } else {
         log(arguments,LOG_FATAL);
       }
-      load_item_done();
       async_loaded("font");
     }
   });

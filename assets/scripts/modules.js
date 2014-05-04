@@ -6,14 +6,24 @@ var MODULES=[
   "-util",
   "-animation",
   "get",
+
+  "game",
+
   "style",
+
   "font",
   "text",
-//  "asset",
-  "input",
-  "game",
+
+  "sprite",
+
+  "map",
+
   "menu",
+
   "canvas",
+  "input",
+  "ui",
+
   "load"
 ];
 
@@ -85,11 +95,14 @@ function log(s,level) {
 // ASYNC (AJAX etc.)
 
 function async(name) {
-  async_modules[name]=false;
+  if(name in async_modules)
+    async_modules[name]+=1;
+  else
+    async_modules[name]=1;
 }
 
 function async_loaded(name) {
-  async_modules[name]=true;
+  async_modules[name]-=1;
   async_check();
 }
 
@@ -100,7 +113,7 @@ function async_wait(callback) {
 
 function async_check() {
   for(var i in async_modules) {
-    if(async_modules[i] == false)
+    if(async_modules[i] != 0)
       return;
   }
   if(async_done_callback)
@@ -135,10 +148,10 @@ function load_module(name) {
   document.head.appendChild(el);
   el.onload=function() {
     modules[name].script=true;
-    if(modules[name].library)
-      log("Loaded library "+name.substr(1));
-    else
-      log("Loaded module "+name);
+    //    if(modules[name].library)
+    //      log("Loaded library "+name.substr(1));
+    //    else
+    //      log("Loaded module "+name);
     for(var i in modules) {
       var m=modules[i];
       if(!m.script)
