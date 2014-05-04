@@ -16,6 +16,8 @@ var Sprite=function(options) {
 
   this.drawFrame=function(cc,x,y,frame,image) { // image: center, left, left-top-inset, etc.
     image=this.images[image];
+    if(!image)
+      return;
     var offset=frame*image.frame_width;
     var size={
       width:image.frame_width,

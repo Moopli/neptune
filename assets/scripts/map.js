@@ -5,6 +5,38 @@ var Block=function(options) {
   this.style={};
   this.map=null;
 
+  this.sides={};
+
+  this.sides.top={
+    dirt:["air"],
+    rock:[]
+  };
+
+  this.sides.left={
+    dirt:[],
+    rock:[]
+  };
+
+  this.sides.top_left_outside={ // only if left AND top are one of these
+    dirt:["air"],
+    rock:[]
+  };
+
+  this.sides.top_right_outside={
+    dirt:["air"],
+    rock:[]
+  };
+
+  this.sides.top_left_inside={ // only if ((left-top is NOT) AND (top is))
+    dirt:["air"],
+    rock:[]
+  };
+
+  this.sides.top_right_inside={
+    dirt:["air"],
+    rock:[]
+  };
+
   if(options) {
     if("type" in options) this.type=options.type;
     if("pos" in options) this.pos=options.pos;
@@ -20,19 +52,42 @@ var Block=function(options) {
       rotate="all";
       frames.center=4;
       frames.top=4;
+      frames.top_left_outside=4;
+      frames.top_right_outside=4;
+      frames.top_left_inside=4;
+      frames.top_right_inside=4;
     } else if(this.type == "rock") {
       rotate="180";
       frames.center=4;
+      frames.top=4;
+      frames.top_left_outside=4;
+      frames.top_left_inside=4;
+      frames.top_right_inside=4;
     }
+
     this.style.center={};
-    this.style.center.frame=clamp(0,Math.floor(Math.random()*frames.center),frames.center);
+    this.style.center.frame=floor(rand()*frames.center);
+
     this.style.top={};
-    this.style.top.frame=clamp(0,Math.floor(Math.random()*frames.top),frames.top);
+    this.style.top.frame=floor(rand()*frames.top);
+
+    this.style.top_left_outside={};
+    this.style.top_left_outside.frame=floor(rand()*frames.top_left_outside);
+
+    this.style.top_right_outside={};
+    this.style.top_right_outside.frame=floor(rand()*frames.top_right_outside);
+
+    this.style.top_left_inside={};
+    this.style.top_left_inside.frame=floor(rand()*frames.top_left_inside);
+
+    this.style.top_right_inside={};
+    this.style.top_right_inside.frame=floor(rand()*frames.top_right_inside);
+
     this.style.center.angle=0;
     if(rotate == "all")
-      this.style.center.angle=Math.floor(Math.random()*4)/4*Math.PI*2;
+      this.style.center.angle=floor(rand()*4)/4*Math.PI*2;
     else if(rotate == "180")
-      this.style.center.angle=Math.floor(Math.random()*2)/2*Math.PI*2;
+      this.style.center.angle=floor(rand()*2)/2*Math.PI*2;
   };
 
   this.drawCenter=function(cc,sprite) {
@@ -41,10 +96,34 @@ var Block=function(options) {
 
   this.drawTop=function(cc,sprite) {
     var bs=prop.map.block.size;
-    sprite.drawFrame(cc,0,-bs,this.style.top.frame,"top");
+    sprite.drawFrame(cc,0,-floor(bs*0.5),this.style.top.frame,"top");
   };
 
-  this.render=function(cc) {
+  this.drawTopLeftOutside=function(cc,sprite) {
+    var bs=prop.map.block.size;
+    sprite.drawFrame(cc,-floor(bs*0.5),-floor(bs*0.5),
+                     this.style.top_left_outside.frame,"top-left-outside");
+  };
+
+  this.drawTopRightOutside=function(cc,sprite) {
+    var bs=prop.map.block.size;
+    sprite.drawFrame(cc,floor(bs*0.5),-floor(bs*0.5),
+                     this.style.top_left_outside.frame,"top-right-outside");
+  };
+
+  this.drawTopLeftInside=function(cc,sprite) {
+    var bs=prop.map.block.size;
+    sprite.drawFrame(cc,-floor(bs*0.5),-floor(bs*0.5),
+                     this.style.top_left_inside.frame,"top-left-inside");
+  };
+
+  this.drawTopRightInside=function(cc,sprite) {
+    var bs=prop.map.block.size;
+    sprite.drawFrame(cc,floor(bs*0.5),-floor(bs*0.5),
+                     this.style.top_left_inside.frame,"top-right-inside");
+  };
+
+  this.render=function(cc,center) {
     this.pickStyle();
 
     var bs=prop.map.block.size;
@@ -61,14 +140,55 @@ var Block=function(options) {
     
     cc.save();
     cc.translate(x*bs,-y*bs);
-    cc.translate(bs/2,bs/2);
-    cc.rotate(this.style.center_angle);
-    cc.translate(-bs/2,-bs/2);
     
-    this.drawCenter(cc,sprite);
-    var temp_block=this.map.getBlock(x,y+1); // above
-    if(temp_block && temp_block.type != this.type)
-      this.drawTop(cc,sprite);
+    if(center) {
+      cc.save()
+      cc.translate(bs/2,bs/2);
+      cc.rotate(this.style.center_angle);
+      cc.translate(-bs/2,-bs/2);
+      this.drawCenter(cc,sprite);
+      cc.restore();
+    } else {
+
+      var temp_block=this.map.getBlock(x,y+1); // above
+      var top_type=(temp_block?temp_block.type:"air");
+
+      temp_block=this.map.getBlock(x-1,y); // left
+      var left_type=(temp_block?temp_block.type:"air");
+
+      temp_block=this.map.getBlock(x+1,y); // right
+      var right_type=(temp_block?temp_block.type:"air");
+
+      temp_block=this.map.getBlock(x-1,y+1); // top left
+      var top_left_type=(temp_block?temp_block.type:"air");
+
+      temp_block=this.map.getBlock(x+1,y+1); // top right
+      var top_right_type=(temp_block?temp_block.type:"air");
+
+      var top=contains(this.sides.top[this.type],top_type);
+      var left=contains(this.sides.left[this.type],left_type);
+
+      var top_left_outside=(contains(this.sides.top_left_outside[this.type],top_type) &&
+                            contains(this.sides.top_left_outside[this.type],left_type));
+      var top_right_outside=(contains(this.sides.top_right_outside[this.type],top_type) &&
+                             contains(this.sides.top_right_outside[this.type],right_type));
+      var top_left_inside=(contains(this.sides.top_left_inside[this.type],top_type) &&
+                           !contains(this.sides.top_left_inside[this.type],top_left_type));
+      var top_right_inside=(contains(this.sides.top_right_inside[this.type],top_type) &&
+                            !contains(this.sides.top_right_inside[this.type],top_right_type));
+
+      if(top)
+        this.drawTop(cc,sprite);
+      if(top_left_outside)
+        this.drawTopLeftOutside(cc,sprite);
+      if(top_right_outside)
+        this.drawTopRightOutside(cc,sprite);
+      if(top_left_inside)
+        this.drawTopLeftInside(cc,sprite);
+      if(top_right_inside)
+        this.drawTopRightInside(cc,sprite);
+    }
+
     cc.restore();
 
   };
@@ -158,15 +278,19 @@ var Map=function(data) {
       map:this,
       pos:[x,y]
     });
-    this.bounds[0]=Math.min(this.bounds[0],x);
-    this.bounds[1]=Math.min(this.bounds[1],y);
+    this.bounds[0]=Math.min(this.bounds[0],x-1);
+    this.bounds[1]=Math.min(this.bounds[1],y-1);
 
-    this.bounds[2]=Math.max(this.bounds[2],x);
-    this.bounds[3]=Math.max(this.bounds[3],y);
+    this.bounds[2]=Math.max(this.bounds[2],x+1);
+    this.bounds[3]=Math.max(this.bounds[3],y+1);
+  };
+
+  this.renderBlockCenter=function(block) {
+    block.render(this.canvas,true);
   };
 
   this.renderBlock=function(block) {
-    block.render(this.canvas);
+    block.render(this.canvas,false);
   };
 
   this.render=function() {
@@ -176,7 +300,12 @@ var Map=function(data) {
     this.canvas.canvas.width=(this.bounds[2]-this.bounds[0])*bs;
     this.canvas.canvas.height=(this.bounds[3]-this.bounds[1])*bs;
     canvas_clear(this.canvas);
+    this.canvas.translate(bs,bs);
     $("#map-prerender").css("display","none")
+    for(var i in this.blocks) {
+      var block=this.blocks[i];
+      this.renderBlockCenter(block);
+    }
     for(var i in this.blocks) {
       var block=this.blocks[i];
       this.renderBlock(block);

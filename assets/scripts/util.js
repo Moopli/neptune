@@ -51,8 +51,16 @@ function normalize(v,length) {
     ]);
 }
 
-function fl(n) {
+function floor(n) {
     return Math.floor(n);
+}
+
+function ceil(n) {
+    return Math.ceil(n);
+}
+
+function rand() {
+  return Math.random();
 }
 
 function randint(l,h) {
@@ -136,4 +144,8 @@ function mod(x,y) {
   if(x < 0)
     x=(y-x)-2;
   return x;
+}
+
+function contains(list,value) {
+  return list.indexOf(value) >= 0;
 }

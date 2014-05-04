@@ -7,7 +7,23 @@
     },
     "top":{
       "url":"dirt/top.png",
-      "frames":2
+      "frames":4
+    },
+    "top-left-outside":{
+      "url":"dirt/top-left-outside.png",
+      "frames":4
+    },
+    "top-right-outside":{
+      "url":"dirt/top-right-outside.png",
+      "frames":4
+    },
+    "top-left-inside":{
+      "url":"dirt/top-left-inside.png",
+      "frames":4
+    },
+    "top-right-inside":{
+      "url":"dirt/top-right-inside.png",
+      "frames":4
     }
   }
 }

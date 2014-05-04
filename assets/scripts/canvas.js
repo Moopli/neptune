@@ -122,41 +122,16 @@ function canvas_draw_background(cc) {
 
 // map
 
-function canvas_draw_block(cc,block) {
-  var bs=prop.map.block.size;
-  var sprite=sprite_get("block","dirt");
-  sprite.drawFrame(cc,0,0,block.style.center,"center");
-}
-
 function canvas_draw_map(cc) {
   if(game_mode() != "game")
     return;
   var map=map_current();
   var bs=prop.map.block.size;
 //  cc.drawImage(map.canvas.canvas,-map.bounds[0]*bs,-map.bounds[1]*bs);
-  cc.drawImage(map.canvas.canvas,0,0);
+  cc.drawImage(map.canvas.canvas,-bs,-bs);
   return;
-
-  var viewport=ui_viewport();
-  var map=map_current();
-  if(!map)
-    return;
-  var i=0;
-  var bs=prop.map.block.size*prop.canvas.scale;
-  for(var x=viewport[0];x<viewport[2];x++) {
-    for(var y=viewport[1];y<viewport[3];y++) {
-      var block=map.getBlock(x,y);
-      if(!block)
-        continue;
-      cc.save();
-      cc.translate(x*bs,-y*bs);
-      canvas_draw_block(cc,block);
-      cc.restore();
-      i++;
-    }
-  }
-//  console.log(i);
 }
+
 
 // menu
 
