@@ -16,6 +16,7 @@ function ui_viewport() { // returns [left,top,width,height] in blocks
 function ui_update() {
   if(!game_paused()) {
     prop.ui.pan[0]=(Math.sin(time()*0.2)*20)+20;
+    prop.ui.pan[0]=2;
     prop.ui.pan[1]=0;
     canvas_dirty("map");
   }

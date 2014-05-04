@@ -24,6 +24,7 @@ function canvas_init() {
   canvas_add("background");
   canvas_add("map");
   canvas_add("menu");
+  canvas_add("level");
   if(RELEASE == false)
     canvas_add("debug");
 }
@@ -132,7 +133,6 @@ function canvas_draw_map(cc) {
   return;
 }
 
-
 // menu
 
 function canvas_draw_menu(cc) {
@@ -144,7 +144,7 @@ function canvas_draw_menu(cc) {
     return;
   cc.save();
   if(game_mode() != "start" && game_paused())
-    cc.globalAlpha=0.9;
+    cc.globalAlpha=0.7;
   cc.fillStyle=prop.style.ui.bg;
   cc.fillRect(0,0,prop.canvas.size.width,prop.canvas.size.height);
   cc.restore();
@@ -235,20 +235,54 @@ function canvas_draw_menu(cc) {
   canvas_clean("menu");
 }
 
+// level
+
+function canvas_draw_level(cc) {
+  if(game_mode() != "load") {
+    canvas_clean("level");
+    return;
+  }
+  var font=prop.font.ui;
+
+  cc.fillStyle=prop.style.ui.bg;
+  cc.fillRect(0,0,prop.canvas.size.width,prop.canvas.size.height);
+
+  var center=floor(prop.canvas.size.width/2);
+
+  var map=prop.game.map;
+  console.log(map);
+
+  text_draw(cc,"Loading "+map.info.name,center,30,{
+    font:font,
+    style:"logo",
+    size:2,
+    align:"center baseline"
+  });
+
+  text_draw(cc,map.info.description,center,55,{
+    font:font,
+    style:"white",
+    size:1,
+    align:"center baseline"
+  });
+
+  cc.globalAlpha=0.5;
+
+  text_draw(cc,map.info.author,center,85,{
+    font:font,
+    style:"white",
+    size:1,
+    align:"center baseline"
+  });
+
+  canvas_clean("level");
+}
+
 // debug overlay
 
 function canvas_draw_debug(cc) {
   var pad=3;
   var style="white";
-  if(game_mode() == "game" && !game_paused())
-    style="black";
-  // version
-  text_draw(cc,prop.version_string,prop.canvas.size.width-pad,pad,{
-    font:prop.font.ui,
-    style:style,
-    size:1,
-    align:"right top"
-  });
   // fps
   text_draw(cc,Math.floor(prop.time.fps).toString()+" fps",
             prop.canvas.size.width-pad,prop.canvas.size.height-pad,{
@@ -264,6 +298,15 @@ function canvas_draw_debug(cc) {
     style:style,
     size:1,
     align:"left baseline"
+  });
+  if(game_mode() == "game" && !game_paused())
+    style="black";
+  // version
+  text_draw(cc,prop.version_string,prop.canvas.size.width-pad,pad,{
+    font:prop.font.ui,
+    style:style,
+    size:1,
+    align:"right top"
   });
 }
 
@@ -306,6 +349,17 @@ function canvas_update_menu() {
   cc.restore();
 }
 
+// level
+
+function canvas_update_level() {
+  var cc=canvas_get("level");
+  cc.save();
+  canvas_clear(cc);
+  cc.scale(prop.canvas.scale,prop.canvas.scale);
+  canvas_draw_level(cc);
+  cc.restore();
+}
+
 // debug
 
 function canvas_update_debug() {
@@ -330,6 +384,8 @@ function canvas_update() {
     canvas_update_map();
   if(prop.canvas.dirty["menu"])
     canvas_update_menu();
+  if(prop.canvas.dirty["level"])
+    canvas_update_level();
   if(RELEASE == false) {
     if(prop.time.frames % 10 == 0)
       canvas_dirty("debug");

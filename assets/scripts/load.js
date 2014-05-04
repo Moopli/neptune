@@ -24,10 +24,7 @@ function load_init() {
 }
 
 function load_ready() {
-  $("#load-canvas").fadeOut(1000);
-  setTimeout(function() {
-    load_remove()
-  },1200);
+  load_remove();
 }
 
 function load_remove() {

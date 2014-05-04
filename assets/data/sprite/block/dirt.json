@@ -36,6 +36,22 @@
     "top-right-inside":{
       "url":"dirt/top-right-inside.png",
       "frames":4
+    },
+    "bottom-left-outside":{
+      "url":"dirt/bottom-left-outside.png",
+      "frames":4
+    },
+    "bottom-right-outside":{
+      "url":"dirt/bottom-right-outside.png",
+      "frames":4
+    },
+    "bottom-left-inside":{
+      "url":"dirt/bottom-left-inside.png",
+      "frames":4
+    },
+    "bottom-right-inside":{
+      "url":"dirt/bottom-right-inside.png",
+      "frames":4
     }
   }
 }

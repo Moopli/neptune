@@ -1,4 +1,6 @@
 
+// BLOCK
+
 var Block=function(options) {
   this.type="";
   this.pos=[0,0];
@@ -47,6 +49,26 @@ var Block=function(options) {
     rock:[]
   };
 
+  this.sides.bottom_left_outside={
+    dirt:["air"],
+    rock:[]
+  };
+
+  this.sides.bottom_right_outside={
+    dirt:["air"],
+    rock:[]
+  };
+
+  this.sides.bottom_left_inside={
+    dirt:["air"],
+    rock:[]
+  };
+
+  this.sides.bottom_right_inside={
+    dirt:["air"],
+    rock:[]
+  };
+
   if(options) {
     if("type" in options) this.type=options.type;
     if("pos" in options) this.pos=options.pos;
@@ -89,15 +111,35 @@ var Block=function(options) {
       frames.top_right_outside=4;
       frames.top_left_inside=4;
       frames.top_right_inside=4;
+
+      frames.bottom_left_outside=4;
+      frames.bottom_right_outside=4;
+      frames.bottom_left_inside=4;
+      frames.bottom_right_inside=4;
     } else if(this.type == "rock") {
-      rotate="180";
+      rotate="all";
+
       frames.center=4;
       frames.top=4;
+      frames.bottom=4;
       frames.left=4;
       frames.right=4;
+
+      flip.center="no";
+      flip.top="horizontal";
+      flip.bottom="horizontal";
+      flip.left="vertical";
+      flip.right="vertical";
+
       frames.top_left_outside=4;
+      frames.top_right_outside=4;
       frames.top_left_inside=4;
       frames.top_right_inside=4;
+
+      frames.bottom_left_outside=4;
+      frames.bottom_right_outside=4;
+      frames.bottom_left_inside=4;
+      frames.bottom_right_inside=4;
     }
 
     this.style.center={};
@@ -131,6 +173,18 @@ var Block=function(options) {
 
     this.style.top_right_inside={};
     this.style.top_right_inside.frame=floor(this.rand()*frames.top_right_inside);
+
+    this.style.bottom_left_outside={};
+    this.style.bottom_left_outside.frame=floor(this.rand()*frames.bottom_left_outside);
+
+    this.style.bottom_right_outside={};
+    this.style.bottom_right_outside.frame=floor(this.rand()*frames.bottom_right_outside);
+
+    this.style.bottom_left_inside={};
+    this.style.bottom_left_inside.frame=floor(this.rand()*frames.bottom_left_inside);
+
+    this.style.bottom_right_inside={};
+    this.style.bottom_right_inside.frame=floor(this.rand()*frames.bottom_right_inside);
 
     this.style.center.angle=0;
     if(rotate == "all")
@@ -187,6 +241,30 @@ var Block=function(options) {
                      this.style.top_left_inside.frame,"top-right-inside");
   };
 
+  this.drawBottomLeftOutside=function(cc,sprite) {
+    var bs=prop.map.block.size;
+    sprite.drawFrame(cc,-floor(bs*0.5),floor(bs*0.5),
+                     this.style.bottom_left_outside.frame,"bottom-left-outside");
+  };
+
+  this.drawBottomRightOutside=function(cc,sprite) {
+    var bs=prop.map.block.size;
+    sprite.drawFrame(cc,floor(bs*0.5),floor(bs*0.5),
+                     this.style.bottom_right_outside.frame,"bottom-right-outside");
+  };
+
+  this.drawBottomLeftInside=function(cc,sprite) {
+    var bs=prop.map.block.size;
+    sprite.drawFrame(cc,-ceil(bs*0.5),floor(bs*0.5),
+                     this.style.bottom_left_inside.frame,"bottom-left-inside");
+  };
+
+  this.drawBottomRightInside=function(cc,sprite) {
+    var bs=prop.map.block.size;
+    sprite.drawFrame(cc,floor(bs*0.5),floor(bs*0.5),
+                     this.style.bottom_right_inside.frame,"bottom-right-inside");
+  };
+
   this.render=function(cc,mode) {
 
     var bs=prop.map.block.size;
@@ -231,19 +309,36 @@ var Block=function(options) {
       temp_block=this.map.getBlock(x+1,y+1); // top right
       var top_right_type=(temp_block?temp_block.type:"air");
 
-      var top=contains(this.sides.top[this.type],top_type);
-      var bottom=contains(this.sides.bottom[this.type],bottom_type);
-      var left=contains(this.sides.left[this.type],left_type);
-      var right=contains(this.sides.right[this.type],right_type);
+      temp_block=this.map.getBlock(x-1,y-1); // bottom left
+      var bottom_left_type=(temp_block?temp_block.type:"air");
 
-      var top_left_outside=(contains(this.sides.top_left_outside[this.type],top_type) &&
-                            contains(this.sides.top_left_outside[this.type],left_type));
-      var top_right_outside=(contains(this.sides.top_right_outside[this.type],top_type) &&
-                             contains(this.sides.top_right_outside[this.type],right_type));
-      var top_left_inside=(contains(this.sides.top_left_inside[this.type],top_type) &&
-                           !contains(this.sides.top_left_inside[this.type],top_left_type));
-      var top_right_inside=(contains(this.sides.top_right_inside[this.type],top_type) &&
-                            !contains(this.sides.top_right_inside[this.type],top_right_type));
+      temp_block=this.map.getBlock(x+1,y-1); // bottom right
+      var bottom_right_type=(temp_block?temp_block.type:"air");
+
+      var c=contains;
+
+      var top=c(this.sides.top[this.type],top_type);
+      var bottom=c(this.sides.bottom[this.type],bottom_type);
+      var left=c(this.sides.left[this.type],left_type);
+      var right=c(this.sides.right[this.type],right_type);
+
+      var top_left_outside=(c(this.sides.top_left_outside[this.type],top_type) &&
+                            c(this.sides.top_left_outside[this.type],left_type));
+      var top_right_outside=(c(this.sides.top_right_outside[this.type],top_type) &&
+                             c(this.sides.top_right_outside[this.type],right_type));
+      var top_left_inside=(c(this.sides.top_left_inside[this.type],top_type) &&
+                           !c(this.sides.top_left_inside[this.type],top_left_type));
+      var top_right_inside=(c(this.sides.top_right_inside[this.type],top_type) &&
+                            !c(this.sides.top_right_inside[this.type],top_right_type));
+
+      var bottom_left_outside=(c(this.sides.bottom_left_outside[this.type],bottom_type) &&
+                               c(this.sides.bottom_left_outside[this.type],left_type));
+      var bottom_right_outside=(c(this.sides.bottom_right_outside[this.type],bottom_type) &&
+                                c(this.sides.bottom_right_outside[this.type],right_type));
+      var bottom_left_inside=(c(this.sides.bottom_left_inside[this.type],bottom_type) &&
+                           !c(this.sides.bottom_left_inside[this.type],bottom_left_type));
+      var bottom_right_inside=(c(this.sides.bottom_right_inside[this.type],bottom_type) &&
+                            !c(this.sides.bottom_right_inside[this.type],bottom_right_type));
 
       if(mode == "edge") {
         if(top) {
@@ -300,6 +395,12 @@ var Block=function(options) {
           this.drawTopLeftInside(cc,sprite);
         if(top_right_inside)
           this.drawTopRightInside(cc,sprite);
+        if(bottom_left_outside)
+          this.drawBottomLeftOutside(cc,sprite);
+        if(bottom_right_outside)
+          this.drawBottomRightOutside(cc,sprite);
+        if(bottom_right_inside)
+          this.drawBottomRightInside(cc,sprite);
       }
     }
 
@@ -309,9 +410,12 @@ var Block=function(options) {
   
 };
 
+// MAP
+
 var Map=function(data) {
   this.data=data;
   this.blocks={};
+  this.start=[0,0];
 
   this.info={};
 
@@ -380,18 +484,25 @@ var Map=function(data) {
 
   this.addBlock=function(x,y,c) {
     var type=null;
+    var entity=false;
     if(c == "*") {
       type="rock";
     } else if(c == "#") {
       type="dirt";
+    } else if(c == "@") {
+      type="start";
     }
     if(type == null) // air
       return;
-    this.blocks[this.getBlockId(x,y)]=new Block({
-      type:type,
-      map:this,
-      pos:[x,y]
-    });
+    if(type == "start") {
+      this.start=[x,y];
+    } else {
+      this.blocks[this.getBlockId(x,y)]=new Block({
+        type:type,
+        map:this,
+        pos:[x,y]
+      });
+    }
     this.bounds[0]=Math.min(this.bounds[0],x-2);
     this.bounds[1]=Math.min(this.bounds[1],y-2);
 
@@ -438,6 +549,8 @@ var Map=function(data) {
   this.use=function() {
     this.parse();
     this.render();
+    canvas_dirty("load");
+    game_loaded();
     canvas_dirty("map");
   };
 
@@ -453,7 +566,7 @@ function map_init() {
 
   prop.map.map=null; // current map
 
-  map_get("debug");
+  map_load("debug");
 
 }
 
@@ -461,12 +574,17 @@ function map_current() {
   return prop.map.map;
 }
 
-function map_load(name) {
+function map_get(name) {
+  prop.map.maps[name].parse();
+  return prop.map.maps[name];
+}
+
+function map_use(name) {
   prop.map.map=prop.map.maps[name];
   prop.map.map.use();
 }
 
-function map_get(name) {
+function map_load(name) {
   async("map");
 
   var url=prop.map.url+name+".map";

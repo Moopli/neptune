@@ -1,8 +1,9 @@
 
 var Game=function() {
-  this.mode="start"; // start, game
+  this.mode="start"; // start, load, game
   this.paused=true;
   this.level=1;
+  this.map=null;
 };
 
 function game_init() {
@@ -10,9 +11,19 @@ function game_init() {
 }
 
 function game_start() {
+  var map="debug";
   prop.game.paused=false;
+  prop.game.mode="load";
+  prop.game.map=map_get(map);
+  setTimeout(function() {
+    map_use(map);
+  },1);
+  canvas_dirty("level");
+}
+
+function game_loaded() {
   prop.game.mode="game";
-  map_load("debug");
+  canvas_dirty("level");
   canvas_dirty("map");
 }
 
