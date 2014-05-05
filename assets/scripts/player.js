@@ -11,8 +11,8 @@ var Player=Fiber.extend(function() {
       this.dead=false;
       this.die_time=null;
       this.friction={
-        ground:21,
-        air:8
+        ground:210,
+        air:210
       };
 
       this.size=[1,1.7]; // full width and full height

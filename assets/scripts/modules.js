@@ -197,6 +197,7 @@ $(document).ready(function() {
     };
   }
   prop_init();
+  log("Version "+prop.version_string);
   load_modules();
 });
 

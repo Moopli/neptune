@@ -36,7 +36,7 @@ function game_start() {
   prop.game.map=map_get(map);
   setTimeout(function() {
     map_use(map);
-  },delta()*2000);
+  },1000);
   canvas_dirty("level");
 }
 

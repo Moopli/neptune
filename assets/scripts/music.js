@@ -14,14 +14,14 @@ var Music=function(options) {
   }
 
   this.play=function() {
-    this.volume.duration=0.2;
+    this.volume.duration=0.8;
     if(this.name == "pause")
       this.volume.duration=2;
     this.volume.animate(1);
   };
 
   this.pause=function() {
-    this.volume.duration=0.5;
+    this.volume.duration=1;
     this.volume.animate(0);
   };
 
@@ -37,8 +37,7 @@ var Music=function(options) {
   };
 
   this.get=function() {
-    var url=prop.music.url+this.name+".ogg";
-    console.log(url);
+    var url=prop.music.url+this.name+".mp3";
     new Content({
       url:url,
       type:"audio",
@@ -81,21 +80,21 @@ function music_init() {
   ];
 
   for(var i=0;i<tracks.length;i++) {
-//    music_load(tracks[i]);
+    music_load(tracks[i]);
   }
-  music_load("city");
-  music_load("title");
-  music_load("grassland");
-  music_load("water");
-  music_load("train");
-  music_load("fire");
-  music_load("love");
-  music_load("concert");
-  music_load("electric");
-  music_load("level1");
-  music_load("level2");
-  music_load("end");
-  music_load("pause");
+//  music_load("city");
+//  music_load("title");
+//  music_load("grassland");
+//  music_load("water");
+//  music_load("train");
+//  music_load("fire");
+//  music_load("love");
+//  music_load("concert");
+//  music_load("electric");
+//  music_load("level1");
+//  music_load("level2");
+//  music_load("end");
+//  music_load("pause");
 }
 
 function music_ready() {
@@ -120,6 +119,7 @@ function music_pause_all(track) {
 }
 
 function music_switch(track) {
+  log("Switching to "+track);
   music_pause_all(track);
   if(track in prop.music.tracks)
     prop.music.tracks[track].play();

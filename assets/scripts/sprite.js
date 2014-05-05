@@ -83,7 +83,7 @@ function sprite_init() {
   prop.sprite.sprites={};
 
   sprite_load("block","dirt");
-  sprite_load("block","rock");
+//  sprite_load("block","rock");
 
 }
 

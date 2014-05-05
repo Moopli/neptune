@@ -40,8 +40,8 @@ function load_fraction() {
   if(prop.load.items.total == 0)
     return 0;
   var fraction=prop.load.items.done/prop.load.items.total;
-//  fraction*=crange(0,prop.load.items.total,10,0.1,1);
-//  fraction=Math.max(fraction,prop.load.items.fraction);
+  fraction*=crange(0,prop.load.items.total,10,0.1,1);
+  fraction=Math.max(fraction,prop.load.items.fraction);
   prop.load.items.fraction=fraction;
   return fraction;
 }
