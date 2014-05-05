@@ -28,6 +28,11 @@ var Sprite=function(options) {
                  x,y,size.width,size.height);
   };
 
+  this.size=function(image) { // returns [width,height] of image
+    image=this.images[image];
+    return [image.frame_width,image.height];
+  };
+
   this.getImages=function() {
     for(var i in this.images) {
       async("image");
@@ -51,7 +56,6 @@ var Sprite=function(options) {
   };
 
   this.get=function() {
-    var that=this;
     var url=this.prefix+this.name+".json";
     new Content({
       url:url,
@@ -78,8 +82,8 @@ function sprite_init() {
   prop.sprite.url="assets/sprites/";
   prop.sprite.sprites={};
 
-  sprite_download("block","dirt");
-  sprite_download("block","rock");
+  sprite_load("block","dirt");
+  sprite_load("block","rock");
 
 }
 
@@ -87,7 +91,7 @@ function sprite_get(use,name) {
   return prop.sprite.sprites[use][name];
 }
 
-function sprite_download(use,name) {
+function sprite_load(use,name) {
   var sprite=new Sprite({use:use,name:name});
   if(!(use in prop.sprite.sprites))
     prop.sprite.sprites[use]={};

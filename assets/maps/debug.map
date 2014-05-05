@@ -2,7 +2,9 @@
 {
   "name":"Devmap",
   "author":"Jon Ross",
-  "description":"Don't let all of the absurdly overpowered enemies win!"
+  "description":"Don't let all of the absurdly overpowered enemies win!",
+  "music":"grassland",
+  "backdrop":"hills"
 }
 ################################         #                  ########
 #####################################   ##                       

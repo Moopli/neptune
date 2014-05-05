@@ -7,8 +7,6 @@ var MODULES=[
   "-animation",
   "get",
 
-  "game",
-
   "style",
 
   "font",
@@ -16,17 +14,15 @@ var MODULES=[
 
   "sprite",
 
-  "backdrop",
-
-  "input",
-
+  "game",
   "map",
 
+  "input",
   "player",
-
   "menu",
 
   "ui",
+  "backdrop",
   "canvas",
 
   "load"

@@ -17,8 +17,9 @@ function ui_update() {
   if(game_running()) {
 //    prop.ui.pan[0]=(Math.sin(game_time()*0.2)*20)+20;
 //    var map=map_current();
-    prop.ui.pan[0]=prop.player.human.pos[0];
-    prop.ui.pan[1]=prop.player.human.pos[1];
+    prop.ui.pan[0]=prop.player.human.pos[0]+4;
+    prop.ui.pan[1]=prop.player.human.pos[1]-4;
+    canvas_dirty("backdrop");
     canvas_dirty("map");
     canvas_dirty("players");
   }

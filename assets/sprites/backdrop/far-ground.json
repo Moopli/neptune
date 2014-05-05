@@ -1,0 +1,13 @@
+{
+  "type":"derivatives",
+  "images":{
+    "above":{
+      "url":"far-ground/above.png",
+      "frames":1
+    },
+    "below":{
+      "url":"far-ground/below.png",
+      "frames":1
+    }
+  }
+}

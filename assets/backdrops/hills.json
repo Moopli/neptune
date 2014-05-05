@@ -1,0 +1,18 @@
+
+{
+  "name":"hills",
+  "layers":[
+    {
+      "distance":2,
+      "image":"far-ground",
+      "style":{
+        "above":{
+          "repeat":"both"
+        },
+        "below":{
+          "repeat":"x"
+        }
+      }
+    }
+  ]
+}

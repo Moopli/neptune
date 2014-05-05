@@ -618,7 +618,7 @@ var Map=function(data) {
     this.canvas.canvas.height=(this.bounds[3]-this.bounds[1])*bs;
     canvas_clear(this.canvas);
     this.canvas.translate(bs*2,bs*2);
-    $("#map-prerender").css("display","none")
+    $("#map-prerender").detach();
     for(var i in this.blocks) {
       var block=this.blocks[i];
       this.renderBlockCenter(block);

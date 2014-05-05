@@ -60,7 +60,7 @@ function load_frame() {
     // calculate loading bar dimensions; borders are 2px
     var border=2;
     var width=Math.floor((prop.canvas.size.width*0.5)/2)*2; // make sure it's even
-    var height=Math.max(Math.floor(width*0.05/2)*2,8); // height of inside bar
+    var height=Math.max(Math.floor(width*0.01/2)*2,8); // height of inside bar
     var offset=[ // offset of outer border
       Math.floor(prop.canvas.size.width/2-width/2-border*2),
       Math.floor(prop.canvas.size.height/2-height/2-border*2)

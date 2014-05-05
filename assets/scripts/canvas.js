@@ -23,6 +23,7 @@ function canvas_pre() {
 
 function canvas_init() {
   canvas_add("background");
+  canvas_add("backdrop");
   canvas_add("map");
   canvas_add("players");
   canvas_add("menu");
@@ -126,7 +127,10 @@ function canvas_draw_background(cc) {
 // backdrop (buildings, clouds etc.)
 
 function canvas_draw_backdrop(cc) {
-
+  for(var i in prop.backdrop.backdrops) {
+    var backdrop=prop.backdrop.backdrops[i];
+    backdrop.draw(cc);
+  }
 }
 
 // map
@@ -480,5 +484,5 @@ function canvas_update() {
     if(prop.canvas.dirty["debug"])
       canvas_update_debug();
   }
-  prop.temp=prop.canvas.render;
+//  prop.temp=prop.canvas.render;
 }
