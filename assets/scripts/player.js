@@ -94,14 +94,13 @@ var Player=Fiber.extend(function() {
       this.hit.bottom=false;
       if(this.location.top-margin < this.pos[1]+this.size[1]) {
         this.hit.top=true;
-        this.pos[1]=this.location.top-this.size[1];
+        this.pos[1]=this.location.top-this.size[1]-margin;
         if(this.speed[1] > margin) this.speed[1]=0;
         else this.pos[1]-=margin*1.1;
       } else if(this.location.bottom+margin > this.pos[1]) {
         this.on_ground=true;
         this.hit.bottom=true;
-        this.pos[1]=this.location.bottom;
-        console.log("WHAMBAM!");
+        this.pos[1]=this.location.bottom+margin*1.1;
         if(this.speed[1] < -margin) this.speed[1]=0;
         else this.pos[1]+=margin*1.1;
       }
@@ -109,13 +108,11 @@ var Player=Fiber.extend(function() {
     updateCollision:function() {
 
       this.updateObstacles();
-      this.updateHorizontalCollision(0.05);
+      this.updateHorizontalCollision(0.08);
 
       this.updateObstacles();
-      this.updateVerticalCollision(0.01);
+      this.updateVerticalCollision(0.04p);
 
-      this.updateObstacles();
-      this.updateHorizontalCollision(0.001);
     },
     updateGravity:function() {
 //      return;

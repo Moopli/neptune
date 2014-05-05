@@ -31,7 +31,7 @@ var MODULES=[
 ];
 
 // saved as prop.version and prop.version_string
-var VERSION=[0,0,7];
+var VERSION=[0,0,8];
 
 // are you using a main loop? (you must call update() afterward disable/reenable)
 var UPDATE=true;
