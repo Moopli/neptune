@@ -4,91 +4,104 @@ var Player=Fiber.extend(function() {
     init:function(options) {
       this.pos=[0,0]; // measured from the center bottom
       this.speed=[0,0]; // blocks per second
-      this.max_speed=[8,16];
-      this.jump_force=2;
+      this.max_speed=[12,16];
+      this.jump_force=8;
       this.accel=[0.2,0]; // time it takes to get to max_speed (ignored)
       this.direction=[0,0]; // [0] is -1 (left) to 1 (right), [1] is 0 (no jump) to 1 (jump)
       this.dead=false;
       this.die_time=null;
 
-      this.size=[1,1]; // full width and full height
+      this.size=[1.1,1.5]; // full width and full height
 
       this.on_ground=false;
 
-      this.location=[0,0,0,0]; // closest obstacle location from EDGE of player
+      this.location={
+        left:0,
+        right:0
+      };
     },
     updateDirection:function() {
       this.speed[0]+=(this.direction[0]*this.max_speed[0]);
       if(this.on_ground)
-        this.speed[1]+=(this.direction[1]*this.jump_force);
-      this.speed[1]+=(this.direction[1]*this.max_speed[0]);
+        this.speed[1]=(this.direction[1]*this.jump_force);
+//      this.speed[1]+=(this.direction[1]*this.max_speed[0]);
       this.speed[0]=clamp(-this.max_speed[0],this.speed[0],this.max_speed[0]);
       this.speed[1]=clamp(-this.max_speed[1],this.speed[1],this.max_speed[1]);
     },
-    updateObstacles:function(mode) {
+    updateObstacles:function(horizontal) {
       var map=map_current();
       var gap=1;
       var left_position=this.pos[0]-this.size[0]/2+pbig;
+      var center_position=this.pos[0];
       var right_position=this.pos[0]+this.size[0]/2-pbig;
       var top_position=this.pos[1]+this.size[1]-pbig;
+      var middle_position=this.pos[1]+this.size[1]/2;
       var bottom_position=this.pos[1]+pbig;
 
       var left_block_location=Math.max(
         map.getLeftPhysicsBlock(left_position,bottom_position),
+        map.getLeftPhysicsBlock(left_position,middle_position),
         map.getLeftPhysicsBlock(left_position,top_position));
       var right_block_location=Math.min(
         map.getRightPhysicsBlock(right_position,bottom_position),
+        map.getRightPhysicsBlock(right_position,middle_position),
         map.getRightPhysicsBlock(right_position,top_position));
       var top_block_location=Math.min(
         map.getTopPhysicsBlock(left_position,top_position),
+        map.getTopPhysicsBlock(center_position,top_position),
         map.getTopPhysicsBlock(right_position,top_position));
-      var bottom_block_location=Math.max(
+      var bottom_block_location=Math.min(
         map.getBottomPhysicsBlock(left_position,bottom_position),
+        map.getBottomPhysicsBlock(center_position,bottom_position),
         map.getBottomPhysicsBlock(right_position,bottom_position));
 
-      this.location[0]=left_block_location+this.size[0]/2;
-      this.location[1]=top_block_location-this.size[1];
-      this.location[2]=right_block_location-this.size[0]/2;
-      this.location[3]=bottom_block_location;
-      prop.temp=this.pos[0]-this.location[0];
+      this.location.left=left_block_location;
+      this.location.right=right_block_location;
+      this.location.top=top_block_location;
+      this.location.bottom=bottom_block_location;
+      prop.temp=this.speed[1];
     },
-    updateHorizontalCollision:function() {
-      if(this.location[0]+ptiny > this.pos[0]) {
-        this.pos[0]=this.location[0];
-        if(this.speed[0] < ptiny) this.speed[0]=0;
-      } else if(this.location[2]-ptiny < this.pos[0]) {
-        this.pos[0]=this.location[2];
-        if(this.speed[0] > -ptiny) this.speed[0]=0;
+    updateHorizontalCollision:function(margin) {
+      if(this.location.left+margin > this.pos[0]-this.size[0]/2) {
+        this.pos[0]=this.location.left+this.size[0]/2;
+        if(this.speed[0] < margin) this.speed[0]=0;
+        else this.pos[0]+=margin*1.1;
+      } else if(this.location.right-margin < this.pos[0]+this.size[0]/2) {
+        this.pos[0]=this.location.right-this.size[0]/2;
+        if(this.speed[0] > -margin) this.speed[0]=0;
+        else this.pos[0]-=margin*1.1;
       }
     },
-    updateVerticalCollision:function() {
-      if(this.location[1]-ptiny < this.pos[1]) {
-        this.pos[1]=this.location[1];
-        if(this.speed[1] > -ptiny) this.speed[1]=0;
-      } else if(this.location[3]+ptiny > this.pos[1]) {
+    updateVerticalCollision:function(margin) {
+      this.on_ground=false;
+      if(this.location.top-margin < this.pos[1]+this.size[1]) {
+        this.pos[1]=this.location.top-this.size[1];
+        if(this.speed[1] > -margin) this.speed[1]=0;
+        else this.pos[1]-=margin*1.1;
+      } else if(this.location.bottom+margin > this.pos[1]) {
         this.on_ground=true;
-        this.pos[1]=this.location[3];
-        if(this.speed[1] < ptiny) this.speed[1]=0;
+        this.pos[1]=this.location.bottom;
+        if(this.speed[1] < margin) this.speed[1]=0;
+        else this.pos[1]+=margin*1.1;
       }
     },
     updateCollision:function() {
-      this.on_ground=false;
+      this.updateObstacles();
+      this.updateVerticalCollision(0.03);
 
       this.updateObstacles();
-//      this.updateHorizontalCollision();
+      this.updateHorizontalCollision(0.02);
 
       this.updateObstacles();
-      this.updateVerticalCollision();
+      this.updateVerticalCollision(0.001);
 
       this.updateObstacles();
-//      this.updateHorizontalCollision();
-      
+      this.updateHorizontalCollision(0.008);
     },
     updateGravity:function() {
-      return;
       if(this.on_ground) return;
       var map=map_current();
-      this.speed[1]+=map.info.gravity*game_delta();
+      this.speed[1]+=map.info.gravity*physics_delta();
     },
     updatePhysics:function() {
       this.updateGravity();

@@ -352,7 +352,8 @@ function canvas_update_map() {
   canvas_draw_map(cc);
   cc.restore();
   var player=prop.player.human;
-  cc.fillRect(-player.size[0]/2*bs,-player.size[1]*bs,player.size[0]*bs,player.size[1]*bs);
+  cc.fillRect(round(-player.size[0]/2*bs),round(-player.size[1]*bs),
+              round(player.size[0]*bs),round(player.size[1]*bs));
   cc.restore();
   canvas_clean("map");
 }

@@ -28,7 +28,7 @@ window.AudioContext = window.AudioContext||window.webkitAudioContext;
 
 var tiny=0.001;
 var ptiny=0.001;
-var pbig=0.1;
+var pbig=0.01;
 
 var sin_cache={};
 

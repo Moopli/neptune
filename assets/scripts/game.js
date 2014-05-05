@@ -14,7 +14,7 @@ function game_init() {
 }
 
 function game_ready() {
-  game_start();
+
 }
 
 function game_start() {
