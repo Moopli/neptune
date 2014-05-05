@@ -25,6 +25,8 @@ var MODULES=[
   "backdrop",
   "canvas",
 
+  "music",
+
   "load"
 ];
 

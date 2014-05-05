@@ -91,6 +91,9 @@ function within(n,c,r) {
     return true;
 }
 
+function trimNewline(str){
+  return str.replace(/^\n+|\n+$/g,"");
+}
 function trange(il,i,ih,ol,oh) {
     return(ol+(oh-ol)*(i-il)/(ih-il));
     i=(i/(ih-il))-il;

@@ -7,10 +7,12 @@ var Game=function() {
   this.time=0;
   this.speedup=1;
   this.substeps=20; // used for physics only
+  prop.temp=0;
 };
 
-function game_init() {
+function game_pre() {
   prop.game=new Game();
+  game_clear();
 }
 
 function game_ready() {
@@ -18,6 +20,7 @@ function game_ready() {
 }
 
 function game_clear() {
+  prop.temp=0;
   prop.game.mode="start";
   prop.game.paused=true;
   prop.game.level=1;
@@ -33,7 +36,7 @@ function game_start() {
   prop.game.map=map_get(map);
   setTimeout(function() {
     map_use(map);
-  },delta()*5);
+  },delta()*2000);
   canvas_dirty("level");
 }
 
@@ -100,6 +103,8 @@ function game_running() {
 }
 
 function game_update() {
+  prop.game.substeps=round(crange(0.01,delta(),0.1,20,30)*prop.game.speedup);
+//  prop.temp=prop.game.substeps;
   prop.game.time+=game_delta();
 }
 

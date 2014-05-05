@@ -43,5 +43,5 @@ var Animation=function(options) {
     this.ease();
     return this.value;
   };
-  this.step(time());
+  this.step(game_time());
 };

@@ -391,18 +391,18 @@ var Block=function(options) {
         }
       }
       if(mode == "corner") {
-        if(top_left_outside)
+        if(top_left_outside && !top_left_inside)
           this.drawTopLeftOutside(cc,sprite);
-        if(top_right_outside)
+        if(top_right_outside && !top_right_inside)
           this.drawTopRightOutside(cc,sprite);
         if(top_left_inside)
           this.drawTopLeftInside(cc,sprite);
         if(top_right_inside)
           this.drawTopRightInside(cc,sprite);
-        if(bottom_left_outside)
 
+        if(bottom_left_outside && !bottom_left_inside)
           this.drawBottomLeftOutside(cc,sprite);
-        if(bottom_right_outside)
+        if(bottom_right_outside && !bottom_right_inside)
           this.drawBottomRightOutside(cc,sprite);
         if(bottom_left_inside)
           this.drawBottomLeftInside(cc,sprite);
@@ -449,10 +449,11 @@ var Map=function(data) {
     info=JSON.parse(info);
     this.info=info;
     if(!("gravity" in info))
-      info.gravity=-25;
+      info.gravity=1;
+    info.gravity*=-50;
     var x=0;
     var y=0;
-    y-=1;
+    map=trimNewline(map);
     for(var i=0;i<map.length;i++) {
       var c=map[i];
       if(c == "\n") {
@@ -508,7 +509,7 @@ var Map=function(data) {
   this.getLeftPhysicsBlock=function(x,y,distance) { // ignore ghost
     x=ceil(x);
     y=floor(y);
-    if(!distance) distance=5;
+    if(!distance) distance=3;
     for(var i=x+0;i>x-distance;i--) {
       var block=this.getBlock(i,y);
       if(!block)
@@ -523,7 +524,7 @@ var Map=function(data) {
   this.getRightPhysicsBlock=function(x,y,distance) {
     x=floor(x);
     y=floor(y);
-    if(!distance) distance=5;
+    if(!distance) distance=3;
     for(var i=x+0;i<x+distance;i++) {
       var block=this.getBlock(i,y);
       if(!block)
@@ -538,7 +539,7 @@ var Map=function(data) {
   this.getTopPhysicsBlock=function(x,y,distance) {
     x=ceil(x);
     y=floor(y);
-    if(!distance) distance=5;
+    if(!distance) distance=3;
     for(var i=y+0;i<y+distance;i++) {
       var block=this.getBlock(x,i);
       if(!block)
@@ -553,7 +554,7 @@ var Map=function(data) {
   this.getBottomPhysicsBlock=function(x,y,distance) {
     x=ceil(x);
     y=ceil(y);
-    if(!distance) distance=5;
+    if(!distance) distance=3;
     for(var i=y+0;i>y-distance;i--) {
       var block=this.getBlock(x,i);
       if(!block)
@@ -570,7 +571,7 @@ var Map=function(data) {
   };
 
   this.addBlock=function(x,y,c) {
-    var type=null;
+    var type="air";
     var entity=false;
     if(c == "*") {
       type="rock";
@@ -579,11 +580,9 @@ var Map=function(data) {
     } else if(c == "@") {
       type="start";
     }
-    if(type == null) // air
-      return;
     if(type == "start") {
       this.start=[x,y];
-    } else {
+    } else if(type != "air") {
       this.blocks[this.getBlockId(x,y)]=new Block({
         type:type,
         map:this,

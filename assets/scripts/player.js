@@ -4,8 +4,8 @@ var Player=Fiber.extend(function() {
     init:function(options) {
       this.pos=[0,0]; // measured from the center bottom
       this.speed=[0,0]; // blocks per second
-      this.max_speed=[12,16];
-      this.jump_force=21;
+      this.max_speed=[16,30];
+      this.jump_force=22;
       this.accel=[0.2,0]; // time it takes to get to max_speed (ignored)
       this.direction=[0,0]; // [0] is -1 (left) to 1 (right), [1] is 0 (no jump) to 1 (jump)
       this.dead=false;
@@ -15,7 +15,7 @@ var Player=Fiber.extend(function() {
         air:8
       };
 
-      this.size=[1.1,1.5]; // full width and full height
+      this.size=[1,1.7]; // full width and full height
 
       this.hit={
         left:false,
@@ -36,8 +36,10 @@ var Player=Fiber.extend(function() {
       if(this.hit.left) temp=Math.max(0,temp);
       if(this.hit.right) temp=Math.min(0,temp);
       this.speed[0]+=temp;
-      if(this.hit.bottom && !this.hit.top)
+      if(this.hit.bottom && !this.hit.top) {
         this.speed[1]=(clamp(0,this.direction[1],1)*this.jump_force);
+        if(this.direction[1] > ptiny) this.hit.bottom=false;
+      }
 //      this.speed[1]+=(this.direction[1]*this.max_speed[0]);
       this.speed[0]=clamp(-this.max_speed[0],this.speed[0],this.max_speed[0]);
       this.speed[1]=clamp(-this.max_speed[1],this.speed[1],this.max_speed[1]);

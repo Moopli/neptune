@@ -112,6 +112,7 @@ function canvas_clear(cc) {
   cc.clearRect(0,0,cc.canvas.width,cc.canvas.height);
   cc.webkitImageSmoothingEnabled=false;
   cc.mozImageSmoothingEnabled=false;
+  cc.oImageSmoothingEnabled=false;
   cc.imageSmoothingEnabled=false;
 }
 
@@ -376,7 +377,7 @@ function canvas_update_backdrop() {
   var cc=canvas_get("backdrop");
   cc.save();
   cc.scale(prop.canvas.scale,prop.canvas.scale);
-  canvas_clear(cc);
+//  canvas_clear(cc);
   canvas_draw_backdrop(cc);
   cc.restore();
   canvas_clean("backdrop");

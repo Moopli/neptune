@@ -21,6 +21,7 @@ var Content=function(options) {
     this.type="string";
 
   this.getJSON=function() {
+    log("Getting JSON file "+this.url+"...",LOG_DEBUG);
     var that=this;
     $.getJSON(that.url)
       .done(that.dl_done)
@@ -28,34 +29,60 @@ var Content=function(options) {
   };
 
   this.getString=function() {
+    log("Getting plain file "+this.url+"...",LOG_DEBUG);
     $.get(this.url)
       .done(this.dl_done)
       .fail(this.dl_fail);
   };
 
   this.getImage=function() {
-    this.data=new Image();
-    var that=this;
+    log("Getting image "+this.url+"...",LOG_DEBUG);
+    this.data=new Image(this.url);
     this.data.onload=function() {
+      var that=get_queue_current(); // we better be in a queue
+      if(!that) {
+        log("OHSHITSHITSHIT!",LOG_FATAL);
+        return;
+      }
       that.dl_done(that.data);
     };
     this.data.onerror=function() {
+      var that=get_queue_current(); // we better be in a queue
+      if(!that) {
+        log("OHSHITSHITSHIT!",LOG_FATAL);
+        return;
+      }
       that.dl_fail({status:"unknown error"},"unknown error");
     };
     this.data.src=this.url;
   };
 
+  this.getAudio=function() {
+    log("Getting audio "+this.url+"...",LOG_DEBUG);
+    this.data=new Audio(this.url);
+    this.dl_done(this.data);
+  };
+
   this.dl_done=function(data) {
     var that=get_queue_current(); // we better be in a queue
+    if(!that) {
+      log("OHSHITSHITSHIT!",LOG_FATAL);
+      return;
+    }
     that.status="done";
+    log("Downloaded "+that.url,LOG_DEBUG);
     if(that.callback)
       that.callback.call(that.that,"ok",data,that.payload);
-    get_queue_check();
     load_item_done();
+    get_queue_check();
   };
 
   this.dl_fail=function(d,error) {
     var that=get_queue_current(); // we better be in a queue
+    if(!that) {
+      log("OHSHITSHITSHIT!",LOG_FATAL);
+      return;
+    }
     var retry=true;
     log("Failed to get "+that.url+": "+d.status,LOG_WARNING)
     if(that.tries > prop.get.retry.max) {
@@ -74,6 +101,7 @@ var Content=function(options) {
   this.get=function() {
     this.tries+=1;
     var that=this;
+    this.status="download";
     setTimeout(function() {
       if(that.type == "json")
         that.getJSON();
@@ -81,8 +109,9 @@ var Content=function(options) {
         that.getString();
       else if(that.type == "image")
         that.getImage();
+      else if(that.type == "audio")
+        that.getAudio();
     },0);
-    this.status="download";
   };
 
   load_item_add();

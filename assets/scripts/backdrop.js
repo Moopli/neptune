@@ -48,8 +48,8 @@ var BackdropLayer=Fiber.extend(function() {
       this.pan=prop.ui.pan;
     },
     getOffset:function() {
-      var dist=Math.max(1,this.distance);
-      var pan=[(-prop.ui.pan[0])/dist,prop.ui.pan[1]/dist];
+      prop.temp+=1;
+      var pan=[(-prop.ui.pan[0])/this.distance,prop.ui.pan[1]/this.distance];
 //      prop.temp=pan.join(",");
       return pan;
     },
@@ -59,7 +59,8 @@ var BackdropLayer=Fiber.extend(function() {
       cc.save();
       cc.fillStyle=this.pattern[part];
       cc.translate(pan[0]*bs,pan[1]*bs);
-      cc.rect(-pan[0]*bs,-pan[1]*bs,prop.canvas.size.width,prop.canvas.size.height);
+      cc.rect(-pan[0]*bs,-pan[1]*bs,
+              prop.canvas.size.width,prop.canvas.size.height);
       cc.fill();
       cc.restore();
     },
@@ -130,6 +131,7 @@ function backdrop_init() {
 }
 
 function backdrop_ready() {
+//  backdrop_create_patterns(canvas_get("background"));
   backdrop_create_patterns(canvas_get("backdrop"));
 }
 
