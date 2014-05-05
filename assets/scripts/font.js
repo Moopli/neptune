@@ -109,7 +109,7 @@ var Font=function(options) {
 
 function font_init() {
   prop.font={};
-  prop.font.url="assets/data/fonts/";
+  prop.font.url="assets/fonts/";
 
   font_load("ui");
   

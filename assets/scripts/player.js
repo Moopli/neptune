@@ -71,7 +71,6 @@ var Player=Fiber.extend(function() {
       this.location.right=right_block_location;
       this.location.top=top_block_location;
       this.location.bottom=bottom_block_location;
-      prop.temp=this.hit.bottom;
     },
     updateHorizontalCollision:function(margin) {
       this.hit.left=false;
@@ -111,7 +110,7 @@ var Player=Fiber.extend(function() {
       this.updateHorizontalCollision(0.08);
 
       this.updateObstacles();
-      this.updateVerticalCollision(0.04p);
+      this.updateVerticalCollision(0.04);
 
     },
     updateGravity:function() {
@@ -174,5 +173,3 @@ function player_update() {
     canvas_dirty("map");
   }
 }
-
-var physics_delta=game_physics_delta;

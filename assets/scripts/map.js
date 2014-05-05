@@ -645,7 +645,7 @@ var Map=function(data) {
 
 function map_init() {
   prop.map={};
-  prop.map.url="assets/data/maps/";
+  prop.map.url="assets/maps/";
 
   prop.map.maps={};
   prop.map.block={};

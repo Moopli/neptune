@@ -1,7 +1,6 @@
 
 @import "reset.css";
 @import "canvas.css";
-@import "../font/font.css";
 
 html,body {
   height: 100%;

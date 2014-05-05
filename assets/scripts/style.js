@@ -12,4 +12,7 @@ function style_init() {
   prop.style.load={};
   prop.style.load.fade=1;
 
+  prop.style.end={};
+  prop.style.end.fade=1;
+
 }

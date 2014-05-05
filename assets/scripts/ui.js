@@ -19,6 +19,7 @@ function ui_update() {
 //    var map=map_current();
     prop.ui.pan[0]=prop.player.human.pos[0];
     prop.ui.pan[1]=prop.player.human.pos[1];
-//    canvas_dirty("map");
+    canvas_dirty("map");
+    canvas_dirty("players");
   }
 }

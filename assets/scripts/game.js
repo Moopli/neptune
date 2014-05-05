@@ -1,6 +1,6 @@
 
 var Game=function() {
-  this.mode="start"; // start, load, game
+  this.mode="start"; // start, load, game, end
   this.paused=true;
   this.level=1;
   this.map=null;
@@ -15,6 +15,15 @@ function game_init() {
 
 function game_ready() {
 
+}
+
+function game_clear() {
+  prop.game.mode="start";
+  prop.game.paused=true;
+  prop.game.level=1;
+  prop.game.map=null;
+  prop.game.time=0;
+  prop.game.speedup=1;
 }
 
 function game_start() {
@@ -35,6 +44,7 @@ function game_loaded() {
     prop.game.mode="game";
     canvas_dirty("level");
     canvas_dirty("map");
+    canvas_dirty("players");
     player_reset();
     var map=map_current();
     player_warp(map.start[0],map.start[1]);
@@ -43,7 +53,8 @@ function game_loaded() {
 
 function game_end() {
   prop.game.paused=true;
-  prop.game.mode="start";
+  prop.game.mode="end";
+  setTimeout(game_clear,prop.style.end.fade*1000);
 }
 
 function game_save() {
@@ -91,3 +102,5 @@ function game_running() {
 function game_update() {
   prop.game.time+=game_delta();
 }
+
+var physics_delta=game_physics_delta;

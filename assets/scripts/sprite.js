@@ -75,7 +75,7 @@ var Sprite=function(options) {
 
 function sprite_init() {
   prop.sprite={};
-  prop.sprite.url="assets/data/sprite/";
+  prop.sprite.url="assets/sprites/";
   prop.sprite.sprites={};
 
   sprite_download("block","dirt");

@@ -16,6 +16,8 @@ var MODULES=[
 
   "sprite",
 
+  "backdrop",
+
   "input",
 
   "map",

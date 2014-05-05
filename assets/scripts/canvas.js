@@ -16,6 +16,7 @@ function canvas_pre() {
     width:640
   };
   prop.canvas.dirty={};
+  prop.canvas.render=0;
 }
 
 // for game layers
@@ -23,6 +24,7 @@ function canvas_pre() {
 function canvas_init() {
   canvas_add("background");
   canvas_add("map");
+  canvas_add("players");
   canvas_add("menu");
   canvas_add("level");
   if(RELEASE == false)
@@ -121,15 +123,41 @@ function canvas_draw_background(cc) {
   cc.fillRect(0,0,prop.canvas.size.width,prop.canvas.size.height);
 }
 
+// backdrop (buildings, clouds etc.)
+
+function canvas_draw_backdrop(cc) {
+
+}
+
 // map
 
 function canvas_draw_map(cc) {
-  if(game_mode() != "game")
+  if(!game_running()) {
     return;
+  }
   var map=map_current();
   var bs=prop.map.block.size;
   cc.drawImage(map.canvas.canvas,(map.bounds[0]-1)*bs,(map.bounds[1]-1)*bs);
 //  cc.drawImage(map.canvas.canvas,-bs*2,-bs*2);
+  return;
+}
+
+// players
+
+function canvas_draw_player(cc,player) {
+  cc.save();
+  var bs=prop.map.block.size;
+  cc.translate(player.pos[0]*bs,-player.pos[1]*bs)
+  cc.fillRect(round(-player.size[0]/2*bs),round(-player.size[1]*bs),
+              ceil(player.size[0]*bs),ceil(player.size[1]*bs));
+  cc.restore();
+}
+
+function canvas_draw_players(cc) {
+  if(!game_running()) {
+    return;
+  }
+  canvas_draw_player(cc,prop.player.human);
   return;
 }
 
@@ -337,6 +365,18 @@ function canvas_update_background() {
   canvas_clean("background");
 }
 
+// backdrop
+
+function canvas_update_backdrop() {
+  var cc=canvas_get("backdrop");
+  cc.save();
+  cc.scale(prop.canvas.scale,prop.canvas.scale);
+  canvas_clear(cc);
+  canvas_draw_backdrop(cc);
+  cc.restore();
+  canvas_clean("backdrop");
+}
+
 // map
 
 function canvas_update_map() {
@@ -346,16 +386,27 @@ function canvas_update_map() {
   cc.scale(prop.canvas.scale,prop.canvas.scale);
   cc.translate(round(prop.canvas.size.width/2),round(prop.canvas.size.height/2));
   var bs=prop.map.block.size;
-  cc.save();
   cc.translate(-prop.ui.pan[0]*bs,
                prop.ui.pan[1]*bs);
   canvas_draw_map(cc);
   cc.restore();
-  var player=prop.player.human;
-  cc.fillRect(round(-player.size[0]/2*bs),round(-player.size[1]*bs),
-              round(player.size[0]*bs),round(player.size[1]*bs));
-  cc.restore();
   canvas_clean("map");
+}
+
+// players
+
+function canvas_update_players() {
+  var cc=canvas_get("players");
+  cc.save();
+  canvas_clear(cc);
+  cc.scale(prop.canvas.scale,prop.canvas.scale);
+  cc.translate(round(prop.canvas.size.width/2),round(prop.canvas.size.height/2));
+  var bs=prop.map.block.size;
+  cc.translate(-prop.ui.pan[0]*bs,
+               prop.ui.pan[1]*bs);
+  canvas_draw_players(cc);
+  cc.restore();
+  canvas_clean("players");
 }
 
 // menu
@@ -398,18 +449,36 @@ function canvas_update_debug() {
 
 function canvas_update() {
 //  canvas_set_scale(trange(-1,Math.sin(time()*4),1,1,3));
-  if(prop.canvas.dirty["background"])
+  if(prop.canvas.dirty["background"]) {
+    prop.canvas.render+=1;
     canvas_update_background();
-  if(prop.canvas.dirty["map"])
+  }
+  if(prop.canvas.dirty["backdrop"]) {
+    prop.canvas.render+=1;
+    canvas_update_backdrop();
+  }
+  if(prop.canvas.dirty["map"]) {
+    prop.canvas.render+=1;
     canvas_update_map();
-  if(prop.canvas.dirty["menu"])
+  }
+  if(prop.canvas.dirty["players"]) {
+    prop.canvas.render+=1;
+    canvas_update_players();
+  }
+  if(prop.canvas.dirty["menu"]) {
+    prop.canvas.render+=1;
     canvas_update_menu();
-  if(prop.canvas.dirty["level"])
+  }
+  if(prop.canvas.dirty["level"]) {
+    prop.canvas.render+=1;
     canvas_update_level();
+  }
   if(RELEASE == false) {
+//    prop.canvas.render+=1;
     if(prop.time.frames % 10 == 0)
       canvas_dirty("debug");
     if(prop.canvas.dirty["debug"])
       canvas_update_debug();
   }
+  prop.temp=prop.canvas.render;
 }
