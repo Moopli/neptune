@@ -449,7 +449,7 @@ var Map=function(data) {
     info=JSON.parse(info);
     this.info=info;
     if(!("gravity" in info))
-      info.gravity=-15;
+      info.gravity=-25;
     var x=0;
     var y=0;
     y-=1;
