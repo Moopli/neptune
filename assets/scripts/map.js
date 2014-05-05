@@ -85,6 +85,10 @@ var Block=function(options) {
   this.chance=function() {
     return (this.rand() >= 0.5);
   };
+  
+  this.ghost=function() {
+    return false;
+  };
 
   this.pickStyle=function() {
     this.style={};
@@ -255,7 +259,7 @@ var Block=function(options) {
 
   this.drawBottomLeftInside=function(cc,sprite) {
     var bs=prop.map.block.size;
-    sprite.drawFrame(cc,-ceil(bs*0.5),floor(bs*0.5),
+    sprite.drawFrame(cc,-floor(bs*0.5),floor(bs*0.5),
                      this.style.bottom_left_inside.frame,"bottom-left-inside");
   };
 
@@ -336,9 +340,9 @@ var Block=function(options) {
       var bottom_right_outside=(c(this.sides.bottom_right_outside[this.type],bottom_type) &&
                                 c(this.sides.bottom_right_outside[this.type],right_type));
       var bottom_left_inside=(c(this.sides.bottom_left_inside[this.type],bottom_type) &&
-                           !c(this.sides.bottom_left_inside[this.type],bottom_left_type));
+                              !c(this.sides.bottom_left_inside[this.type],bottom_left_type));
       var bottom_right_inside=(c(this.sides.bottom_right_inside[this.type],bottom_type) &&
-                            !c(this.sides.bottom_right_inside[this.type],bottom_right_type));
+                               !c(this.sides.bottom_right_inside[this.type],bottom_right_type));
 
       if(mode == "edge") {
         if(top) {
@@ -396,9 +400,12 @@ var Block=function(options) {
         if(top_right_inside)
           this.drawTopRightInside(cc,sprite);
         if(bottom_left_outside)
+
           this.drawBottomLeftOutside(cc,sprite);
         if(bottom_right_outside)
           this.drawBottomRightOutside(cc,sprite);
+        if(bottom_left_inside)
+          this.drawBottomLeftInside(cc,sprite);
         if(bottom_right_inside)
           this.drawBottomRightInside(cc,sprite);
       }
@@ -441,17 +448,11 @@ var Map=function(data) {
     }
     info=JSON.parse(info);
     this.info=info;
+    if(!("gravity" in info))
+      info.gravity=-2;
     var x=0;
     var y=0;
-    if("offset" in info) {
-      if("y" in info.offset) {
-        y+=info.offset.y;
-      }
-      if("x" in info.offset) {
-        x+=info.offset.x;
-      }
-    }
-    y+=1; // allow for one newline
+    y-=1;
     for(var i=0;i<map.length;i++) {
       var c=map[i];
       if(c == "\n") {
@@ -476,6 +477,92 @@ var Map=function(data) {
       return this.blocks[id];
     }
     return null;
+  };
+
+  this.getBlockRow=function(y,start,end) {
+    if(start == undefined) start=this.bounds[0];
+    if(end == undefined) end=this.bounds[2];
+    start=floor(start);
+    end=ceil(end);
+    var blocks=[];
+    for(var x=start;x<end;x++) {
+      var block=this.getBlock(x,y);
+      if(block) blocks.push(block);
+    }
+    return blocks;
+  };
+
+  this.getBlockColumn=function(x,start,end) {
+    if(start == undefined) start=this.bounds[1];
+    if(end == undefined) end=this.bounds[3];
+    start=floor(start);
+    end=ceil(end);
+    var blocks=[];
+    for(var y=start;y<end;y++) {
+      var block=this.getBlock(x,y)
+      if(block) blocks.push(block);
+    }
+    return blocks;
+  };
+
+  this.getLeftPhysicsBlock=function(x,y,distance) { // ignore ghost
+    x=ceil(x);
+    y=floor(y);
+    if(!distance) distance=5;
+    for(var i=x+0;i>x-distance;i--) {
+      var block=this.getBlock(i,y);
+      if(!block)
+        continue;
+      if(block.ghost())
+        continue;
+      return block.pos[0];
+    }
+    return -Infinity;
+  };
+
+  this.getRightPhysicsBlock=function(x,y,distance) {
+    x=floor(x);
+    y=floor(y);
+    if(!distance) distance=5;
+    for(var i=x+0;i<x+distance;i++) {
+      var block=this.getBlock(i,y);
+      if(!block)
+        continue;
+      if(block.ghost())
+        continue;
+      return block.pos[0]-1;
+    }
+    return Infinity;
+  };
+
+  this.getTopPhysicsBlock=function(x,y,distance) {
+    x=ceil(x);
+    y=floor(y);
+    if(!distance) distance=5;
+    for(var i=y+0;i<y+distance;i++) {
+      var block=this.getBlock(x,i);
+      if(!block)
+        continue;
+      if(block.ghost())
+        continue;
+      return block.pos[1];
+    }
+    return Infinity;
+  };
+
+  this.getBottomPhysicsBlock=function(x,y,distance) {
+    x=ceil(x);
+    y=ceil(y);
+    if(!distance) distance=5;
+    for(var i=y+0;i>y-distance;i--) {
+      var block=this.getBlock(x,i);
+      if(!block)
+        continue;
+      if(block.ghost())
+        continue;
+      return block.pos[1]+1;
+    }
+    return -Infinity;
   };
 
   this.parseBlockId=function(id) {
@@ -504,10 +591,10 @@ var Map=function(data) {
       });
     }
     this.bounds[0]=Math.min(this.bounds[0],x-2);
-    this.bounds[1]=Math.min(this.bounds[1],y-2);
+    this.bounds[1]=Math.min(this.bounds[1],-y-2);
 
     this.bounds[2]=Math.max(this.bounds[2],x+4);
-    this.bounds[3]=Math.max(this.bounds[3],y+4);
+    this.bounds[3]=Math.max(this.bounds[3],-y+4);
   };
 
   this.renderBlockCenter=function(block) {
@@ -530,7 +617,7 @@ var Map=function(data) {
     this.canvas.canvas.width=(this.bounds[2]-this.bounds[0])*bs;
     this.canvas.canvas.height=(this.bounds[3]-this.bounds[1])*bs;
     canvas_clear(this.canvas);
-    this.canvas.translate(bs,bs);
+    this.canvas.translate(bs*2,bs*2);
     $("#map-prerender").css("display","none")
     for(var i in this.blocks) {
       var block=this.blocks[i];

@@ -9,4 +9,7 @@ function style_init() {
 
   prop.style.sky="#bdf";
 
+  prop.style.load={};
+  prop.style.load.fade=1;
+
 }

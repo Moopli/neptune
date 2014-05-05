@@ -128,8 +128,8 @@ function canvas_draw_map(cc) {
     return;
   var map=map_current();
   var bs=prop.map.block.size;
-//  cc.drawImage(map.canvas.canvas,-map.bounds[0]*bs,-map.bounds[1]*bs);
-  cc.drawImage(map.canvas.canvas,-bs,-bs);
+  cc.drawImage(map.canvas.canvas,(map.bounds[0]-1)*bs,(map.bounds[1]-1)*bs);
+//  cc.drawImage(map.canvas.canvas,-bs*2,-bs*2);
   return;
 }
 
@@ -154,14 +154,14 @@ function canvas_draw_menu(cc) {
     size:1,
     align:"right baseline"
   });
-  var align=Math.floor(width);
+  var align=floor(width);
 
   var top=30;
   var pad=10;
   var compact=false;
   align+=pad*2;
   if(prop.canvas.size.width > 600) {
-    align=Math.floor(prop.canvas.size.width/2-font.info.height*10);
+    align=floor(prop.canvas.size.width/2-font.info.height*10);
   } else if(prop.canvas.size.width < 400) {
     compact=true;
     align=font.info.height;
@@ -169,14 +169,14 @@ function canvas_draw_menu(cc) {
   var temp="right baseline";
   var temp2=-pad;
   var items=menu.items;
-  var line_height=Math.floor(font.info.line_height+6);
+  var line_height=floor(font.info.line_height+6);
   if(compact) {
     temp="left baseline";
     temp2=pad;
   }
   var temp3=top;
   if(line_height*items.length+top+pad*2 > prop.canvas.size.height) {
-    top-=Math.floor(line_height*menu.selected);
+    top-=floor(line_height*menu.selected);
     if(compact) {
       temp3=top;
     }
@@ -206,9 +206,9 @@ function canvas_draw_menu(cc) {
     }
     cc.globalAlpha=clamp(0.3,cc.globalAlpha,1);
     if(item.gap)
-      top+=Math.floor(line_height/2);
+      top+=floor(line_height/2);
     if(item.icon) {
-      text_draw_icon(cc,item.icon,Math.floor(align+pad/2),top,{
+      text_draw_icon(cc,item.icon,floor(align+pad/2),top,{
         font:font,
         style:"white",
         size:1,
@@ -238,10 +238,16 @@ function canvas_draw_menu(cc) {
 // level
 
 function canvas_draw_level(cc) {
-  if(game_mode() != "load") {
+
+  if(game_mode() == "start" || (game_mode() == "game" && game_time() > prop.style.load.fade)) {
     canvas_clean("level");
     return;
+  } else {
+    canvas_dirty("level");
   }
+
+  cc.globalAlpha=step(clamp(0,crange(0,game_time(),prop.style.load.fade,1,-0.2),1),0);
+
   var font=prop.font.ui;
 
   cc.fillStyle=prop.style.ui.bg;
@@ -250,32 +256,32 @@ function canvas_draw_level(cc) {
   var center=floor(prop.canvas.size.width/2);
 
   var map=prop.game.map;
-  console.log(map);
 
-  text_draw(cc,"Loading "+map.info.name,center,30,{
+  text_draw(cc,"Loading map...",center,prop.canvas.size.height-30,{
     font:font,
     style:"logo",
     size:2,
     align:"center baseline"
   });
 
-  text_draw(cc,map.info.description,center,55,{
+  text_draw(cc,map.info.name+" by "+map.info.author,center,prop.canvas.size.height-70,{
     font:font,
     style:"white",
     size:1,
     align:"center baseline"
   });
 
-  cc.globalAlpha=0.5;
+  cc.globalAlpha*=0.5;
 
-  text_draw(cc,map.info.author,center,85,{
+  text_draw(cc,map.info.description,center,prop.canvas.size.height-90,{
     font:font,
     style:"white",
     size:1,
     align:"center baseline"
   });
 
-  canvas_clean("level");
+  cc.restore();
+
 }
 
 // debug overlay
@@ -284,7 +290,7 @@ function canvas_draw_debug(cc) {
   var pad=3;
   var style="white";
   // fps
-  text_draw(cc,Math.floor(prop.time.fps).toString()+" fps",
+  text_draw(cc,floor(prop.time.fps).toString()+" fps",
             prop.canvas.size.width-pad,prop.canvas.size.height-pad,{
     font:prop.font.ui,
     style:style,
@@ -292,7 +298,7 @@ function canvas_draw_debug(cc) {
     align:"right baseline"
   });
   // frame spacing
-  text_draw(cc,Math.floor(prop.time.frame.delta*1000).toString()+"ms",
+  text_draw(cc,floor(prop.time.frame.delta*1000).toString()+"ms",
             pad,prop.canvas.size.height-pad,{
     font:prop.font.ui,
     style:style,
@@ -307,6 +313,13 @@ function canvas_draw_debug(cc) {
     style:style,
     size:1,
     align:"right top"
+  });
+  // temp
+  text_draw(cc,prop.temp+"",pad,pad,{
+    font:prop.font.ui,
+    style:style,
+    size:1,
+    align:"left top"
   });
 }
 
@@ -331,9 +344,15 @@ function canvas_update_map() {
   cc.save();
   canvas_clear(cc);
   cc.scale(prop.canvas.scale,prop.canvas.scale);
-  cc.translate(Math.floor(-prop.ui.pan[0]*prop.map.block.size),
-               Math.floor(prop.ui.pan[1]*prop.map.block.size));
+  cc.translate(round(prop.canvas.size.width/2),round(prop.canvas.size.height/2));
+  var bs=prop.map.block.size;
+  cc.save();
+  cc.translate(-prop.ui.pan[0]*bs,
+               prop.ui.pan[1]*bs);
   canvas_draw_map(cc);
+  cc.restore();
+  var player=prop.player.human;
+  cc.fillRect(-player.size[0]/2*bs,-player.size[1]*bs,player.size[0]*bs,player.size[1]*bs);
   cc.restore();
   canvas_clean("map");
 }

@@ -24,13 +24,13 @@ function input_init() {
 
 function input_ready() {
   $(window).keydown(function(e) {
-    prop.input.keys[e.which]+=1;
+    prop.input.keys[e.which]=true;
     input_keydown(e.which);
     return true;
   });
   
   $(window).keyup(function(e) {
-    prop.input.keys[e.which]=0;
+    prop.input.keys[e.which]=false;
     //    log(e.which,LOG_DEBUG);
     return true;
   });
@@ -57,4 +57,20 @@ function input_keydown(keycode) {
 }
 
 function input_update() {
+  if(game_running()) {
+    if(prop.input.keys[prop.input.keysym.right]) {
+      prop.player.human.direction[0]=1;
+    } else if(prop.input.keys[prop.input.keysym.left]) {
+      prop.player.human.direction[0]=-1;
+    } else {
+      prop.player.human.direction[0]=0;
+    }
+    if(prop.input.keys[prop.input.keysym.up]) {
+      prop.player.human.direction[1]=1;
+    } else if(prop.input.keys[prop.input.keysym.down]) {
+      prop.player.human.direction[1]=-1;
+    } else {
+      prop.player.human.direction[1]=0;
+    }
+  }
 }

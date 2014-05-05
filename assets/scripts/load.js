@@ -5,6 +5,7 @@ function load_pre() {
   prop.load.items={};
   prop.load.items.total=0;
   prop.load.items.done=0;
+  prop.load.items.fraction=0;
 }
 
 var load_start=load_pre;
@@ -35,7 +36,11 @@ function load_remove() {
 function load_fraction() {
   if(prop.load.items.total == 0)
     return 0;
-  return prop.load.items.done/prop.load.items.total;
+  var fraction=prop.load.items.done/prop.load.items.total;
+  fraction*=crange(0,prop.load.items.total,10,0.1,1);
+  fraction=Math.max(fraction,prop.load.items.fraction);
+  prop.load.items.fraction=fraction;
+  return fraction;
 }
 
 function load_frame() {

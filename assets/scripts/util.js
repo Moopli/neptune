@@ -26,6 +26,10 @@ window.AudioContext = window.AudioContext||window.webkitAudioContext;
         };
 }());
 
+var tiny=0.001;
+var ptiny=0.001;
+var pbig=0.1;
+
 var sin_cache={};
 
 function sin(v) {
@@ -116,8 +120,13 @@ function crange(il,i,ih,ol,oh) {
     return clamp(ol,trange(il,i,ih,ol,oh),oh);
 }
 
-function srange(il,i,ih) {
-//    return Math.cos();
+function srange(il,i,ih,ol,oh) {
+  i=Math.sin(trange(il,i,ih,-Math.PI/2,Math.PI/2))*0.5+0.5;
+  return (i*(oh-ol))+ol;
+}
+
+function scrange(il,i,ih,ol,oh) {
+  return srange(il,clamp(il,i,ih),ih,ol,oh);
 }
 
 function distance(a,b) {
@@ -146,8 +155,18 @@ function mod(x,y) {
   return x;
 }
 
+function round(n) {
+  return Math.round(n);
+}
+
 function contains(list,value) {
   return list.indexOf(value) >= 0;
 }
 
 Math.PI2=Math.PI*2;
+
+function step(n,steps) {
+  if(steps == 0 || steps == null)
+    return n;
+  return Math.floor(n*steps)/steps;
+}

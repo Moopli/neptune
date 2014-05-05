@@ -14,10 +14,11 @@ function ui_viewport() { // returns [left,top,width,height] in blocks
 }
 
 function ui_update() {
-  if(!game_paused()) {
-    prop.ui.pan[0]=(Math.sin(time()*0.2)*20)+20;
-    prop.ui.pan[0]=2;
-    prop.ui.pan[1]=0;
-    canvas_dirty("map");
+  if(game_running()) {
+//    prop.ui.pan[0]=(Math.sin(game_time()*0.2)*20)+20;
+//    var map=map_current();
+    prop.ui.pan[0]=prop.player.human.pos[0];
+    prop.ui.pan[1]=prop.player.human.pos[1];
+//    canvas_dirty("map");
   }
 }

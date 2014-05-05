@@ -16,13 +16,16 @@ var MODULES=[
 
   "sprite",
 
+  "input",
+
   "map",
+
+  "player",
 
   "menu",
 
-  "canvas",
-  "input",
   "ui",
+  "canvas",
 
   "load"
 ];
@@ -60,6 +63,7 @@ var log_strings={
 
 function prop_init() {
   prop={};
+  prop.temp="nothing here";
   prop.version=VERSION;
   prop.version_string="v"+VERSION.join(".");
   prop.time={};
@@ -227,7 +231,7 @@ function update() {
     prop.time.frame.count=0;
     prop.time.frame.start=time();
   }
-  prop.time.frame.delta=Math.min(time()-prop.time.frame.last,0.9);
+  prop.time.frame.delta=Math.min(time()-prop.time.frame.last,1/20);
   prop.time.frame.last=time();
 }
 
