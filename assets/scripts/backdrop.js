@@ -50,7 +50,7 @@ var BackdropLayer=Fiber.extend(function() {
     getOffset:function() {
       var dist=Math.max(1,this.distance);
       var pan=[(-prop.ui.pan[0])/dist,prop.ui.pan[1]/dist];
-      prop.temp=pan.join(",");
+//      prop.temp=pan.join(",");
       return pan;
     },
     drawPart:function(cc,part) {

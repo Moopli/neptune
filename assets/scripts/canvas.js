@@ -151,7 +151,8 @@ function canvas_draw_map(cc) {
 function canvas_draw_player(cc,player) {
   cc.save();
   var bs=prop.map.block.size;
-  cc.translate(player.pos[0]*bs,-player.pos[1]*bs)
+  var s=prop.canvas.scale;
+  cc.translate(round(player.pos[0]*bs*s)/s,round(-player.pos[1]*bs*s)/s);
   cc.fillRect(round(-player.size[0]/2*bs),round(-player.size[1]*bs),
               ceil(player.size[0]*bs),ceil(player.size[1]*bs));
   cc.restore();
@@ -390,8 +391,9 @@ function canvas_update_map() {
   cc.scale(prop.canvas.scale,prop.canvas.scale);
   cc.translate(round(prop.canvas.size.width/2),round(prop.canvas.size.height/2));
   var bs=prop.map.block.size;
-  cc.translate(-prop.ui.pan[0]*bs,
-               prop.ui.pan[1]*bs);
+  var s=prop.canvas.scale;
+  cc.translate(round(-prop.ui.pan[0]*bs*s)/s,
+               round(prop.ui.pan[1]*bs*s)/s);
   canvas_draw_map(cc);
   cc.restore();
   canvas_clean("map");
@@ -406,8 +408,9 @@ function canvas_update_players() {
   cc.scale(prop.canvas.scale,prop.canvas.scale);
   cc.translate(round(prop.canvas.size.width/2),round(prop.canvas.size.height/2));
   var bs=prop.map.block.size;
-  cc.translate(-prop.ui.pan[0]*bs,
-               prop.ui.pan[1]*bs);
+  var s=prop.canvas.scale;
+  cc.translate(round(-prop.ui.pan[0]*bs*s)/s,
+               round(prop.ui.pan[1]*bs*s)/s);
   canvas_draw_players(cc);
   cc.restore();
   canvas_clean("players");
@@ -457,7 +460,7 @@ function canvas_update() {
     prop.canvas.render+=1;
     canvas_update_background();
   }
-  if(prop.canvas.dirty["backdrop"]) {
+  if(prop.canvas.dirty["backdrop"] && false) {
     prop.canvas.render+=1;
     canvas_update_backdrop();
   }

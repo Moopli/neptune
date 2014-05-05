@@ -6,7 +6,7 @@ var Game=function() {
   this.map=null;
   this.time=0;
   this.speedup=1;
-  this.substeps=10; // used for physics only
+  this.substeps=20; // used for physics only
 };
 
 function game_init() {
