@@ -16,7 +16,7 @@ var Player=Fiber.extend(function() {
         air:10
       };
 
-      this.size=[1.0,1.7]; // full width and full height
+      this.size=[1.01,1.7]; // full width and full height
 
       this.hit={
         left:false,
