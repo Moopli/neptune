@@ -119,7 +119,7 @@ function music_pause_all(track) {
 }
 
 function music_switch(track) {
-  log("Switching to "+track);
+//  log("Switching to "+track);
   music_pause_all(track);
   if(track in prop.music.tracks)
     prop.music.tracks[track].play();

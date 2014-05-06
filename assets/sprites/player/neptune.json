@@ -1,0 +1,9 @@
+{
+  "type":"animation",
+  "images":{
+    "idle-left":{
+      "url":"neptune/left/idle.png",
+      "frames":4
+    }
+  }
+}

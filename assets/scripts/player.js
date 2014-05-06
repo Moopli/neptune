@@ -2,6 +2,7 @@
 var Player=Fiber.extend(function() {
   return {
     init:function(options) {
+      this.type="player";
       this.pos=[0,0]; // measured from the center bottom
       this.speed=[0,0]; // blocks per second
       this.max_speed=[16,30];
@@ -11,11 +12,11 @@ var Player=Fiber.extend(function() {
       this.dead=false;
       this.die_time=null;
       this.friction={
-        ground:210,
-        air:210
+        ground:21,
+        air:10
       };
 
-      this.size=[1,1.7]; // full width and full height
+      this.size=[1.0,1.7]; // full width and full height
 
       this.hit={
         left:false,
@@ -55,13 +56,13 @@ var Player=Fiber.extend(function() {
       var bottom_position=this.pos[1]+pbig;
 
       var left_block_location=Math.max(
-        map.getLeftPhysicsBlock(left_position,bottom_position),
-        map.getLeftPhysicsBlock(left_position,middle_position),
-        map.getLeftPhysicsBlock(left_position,top_position));
+        map.getLeftPhysicsBlock(center_position,bottom_position),
+        map.getLeftPhysicsBlock(center_position,middle_position),
+        map.getLeftPhysicsBlock(center_position,top_position));
       var right_block_location=Math.min(
-        map.getRightPhysicsBlock(right_position,bottom_position),
-        map.getRightPhysicsBlock(right_position,middle_position),
-        map.getRightPhysicsBlock(right_position,top_position));
+        map.getRightPhysicsBlock(center_position,bottom_position),
+        map.getRightPhysicsBlock(center_position,middle_position),
+        map.getRightPhysicsBlock(center_position,top_position));
       var top_block_location=Math.min(
         map.getTopPhysicsBlock(left_position,top_position),
         map.getTopPhysicsBlock(center_position,top_position),
@@ -77,16 +78,16 @@ var Player=Fiber.extend(function() {
       this.location.bottom=bottom_block_location;
     },
     updateHorizontalCollision:function(margin,state) {
-      if(this.location.left+margin > this.pos[0]-this.size[0]/2) {
+      if(this.location.left+margin > this.pos[0]-this.size[0]/4) {
         this.hit.left=true;
-        this.pos[0]=this.location.left+this.size[0]/2+margin;
-        if(this.speed[0] < margin) this.speed[0]=0;
-        else this.pos[0]+=margin*1.3;
-      } else if(this.location.right-margin < this.pos[0]+this.size[0]/2) {
+        this.pos[0]=this.location.left+this.size[0]/4;
+        if(this.speed[0] < -margin) this.speed[0]=0;
+        else this.pos[0]+=margin*1.01;
+      } else if(this.location.right-margin < this.pos[0]+this.size[0]/4) {
         this.hit.right=true;
-        this.pos[0]=this.location.right-this.size[0]/2-margin;
-        if(this.speed[0] > -margin) this.speed[0]=0;
-        else this.pos[0]-=margin*1.3;
+        this.pos[0]=this.location.right-this.size[0]/4;
+        if(this.speed[0] > margin) this.speed[0]=0;
+        else this.pos[0]-=margin*1.01;
       }
     },
     updateVerticalCollision:function(margin,state) {
@@ -155,6 +156,7 @@ var HumanPlayer=Player.extend(function(base) {
   return {
     init:function(options) {
       base.init.call(this,options);
+      this.type="neptune";
       this.health=100;
     }
   };

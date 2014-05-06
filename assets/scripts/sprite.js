@@ -33,6 +33,11 @@ var Sprite=function(options) {
     return [image.frame_width,image.height];
   };
 
+  this.frames=function(image) { // returns frames of image
+    image=this.images[image];
+    return image.frames;
+  };
+
   this.getImages=function() {
     for(var i in this.images) {
       async("image");
@@ -41,13 +46,14 @@ var Sprite=function(options) {
         type:"image",
         that:this,
         payload:i,
-        callback:function(status,data,payload) {
-          var pp=this.images[payload];
-          this.images[payload]={
+        callback:function(status,data,name) {
+          var pp=this.images[name];
+          this.images[name]={
             data:data,
             width:data.naturalWidth,
             height:data.naturalHeight,
             frame_width:Math.floor(data.naturalWidth/pp.frames),
+            frames:pp.frames
           };
           async_loaded("image");
         }
@@ -64,7 +70,6 @@ var Sprite=function(options) {
       callback:function(status,data) {
         if(status == "ok") {
           this.images=data.images;
-          this.frames=data.frames;
           this.type=data.type;
           this.getImages();
         } else {
@@ -83,6 +88,7 @@ function sprite_init() {
   prop.sprite.sprites={};
 
   sprite_load("block","dirt");
+  sprite_load("player","neptune");
 //  sprite_load("block","rock");
 
 }

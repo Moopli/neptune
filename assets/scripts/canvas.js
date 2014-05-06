@@ -149,13 +149,25 @@ function canvas_draw_map(cc) {
 
 // players
 
+function canvas_draw_player_neptune(cc,player) {
+  var bs=prop.map.block.size;
+  var sprite=sprite_get("player","neptune");
+  var frame=round(prop.time.frames/12)%sprite.frames("idle-left");
+  prop.temp=frame;
+  sprite.drawFrame(cc,round(-player.size[0]/2*bs),round(-player.size[1]*bs),frame,"idle-left");
+}
+
 function canvas_draw_player(cc,player) {
-  cc.save();
   var bs=prop.map.block.size;
   var s=prop.canvas.scale;
+  cc.save();
   cc.translate(round(player.pos[0]*bs*s)/s,round(-player.pos[1]*bs*s)/s);
-  cc.fillRect(round(-player.size[0]/2*bs),round(-player.size[1]*bs),
-              ceil(player.size[0]*bs),ceil(player.size[1]*bs));
+  if(player.type == "neptune") {
+    canvas_draw_player_neptune(cc,player);
+  } else {
+    cc.fillRect(round(-player.size[0]/2*bs),round(-player.size[1]*bs),
+                ceil(player.size[0]*bs),ceil(player.size[1]*bs));
+  }
   cc.restore();
 }
 

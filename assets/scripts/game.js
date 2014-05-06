@@ -7,7 +7,6 @@ var Game=function() {
   this.time=0;
   this.speedup=1;
   this.substeps=20; // used for physics only
-  prop.temp=0;
 };
 
 function game_pre() {
@@ -20,7 +19,6 @@ function game_ready() {
 }
 
 function game_clear() {
-  prop.temp=0;
   prop.game.mode="start";
   prop.game.paused=true;
   prop.game.level=1;
@@ -104,7 +102,6 @@ function game_running() {
 
 function game_update() {
   prop.game.substeps=round(crange(0.01,delta(),0.1,20,30)*prop.game.speedup);
-//  prop.temp=prop.game.substeps;
   prop.game.time+=game_delta();
 }
 
