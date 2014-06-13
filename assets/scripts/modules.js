@@ -93,7 +93,7 @@ function prop_set(key,value) {
 // MISC (DEBUG)
 
 function log(s,level) {
-  if(!level)
+  if(level == undefined)
     level=LOG_INFO;
   if(prop.log <= level) {
     var text="[ "+log_strings[level]+" ]";
