@@ -29,6 +29,7 @@ var Music=function(options) {
     if(!this.audio)
       return;
     this.audio.volume=this.volume.get();
+    if(!prop.music.enabled) this.audio.volume=0;
     if(this.audio.volume == 0 && this.audio.paused == false)
       this.audio.pause();
     else if(this.audio.volume > 0 && this.audio.paused)
@@ -60,6 +61,9 @@ function music_init() {
   prop.music.url="assets/audio/music/";
 
   prop.music.current=null;
+  
+  prop.music.enabled=true;
+  prop.music.enabled=false;
 
   prop.music.tracks={};
 

@@ -153,7 +153,6 @@ function canvas_draw_player_neptune(cc,player) {
   var bs=prop.map.block.size;
   var sprite=sprite_get("player","neptune");
   var frame=round(prop.time.frames/12)%sprite.frames("idle-left");
-  prop.temp=frame;
   sprite.drawFrame(cc,round(-player.size[0]/2*bs),round(-player.size[1]*bs),frame,"idle-left");
 }
 
@@ -261,7 +260,12 @@ function canvas_draw_menu(cc) {
         align:"right baseline"
       });
     }
-    text_draw_button(cc,item.text,align+pad,top,{
+    var prop_text="";
+    if(item.type() == "prop") {
+      if(item.prop_type == "toggle") prop_text=(prop_get(item.action)?item.prop_true_text:item.prop_false_text);
+    }
+    if(prop_text) prop_text=" "+prop_text;
+    text_draw_button(cc,item.text+prop_text,align+pad,top,{
       selected:menu.selected==i,
       border:2,
       padding:3,

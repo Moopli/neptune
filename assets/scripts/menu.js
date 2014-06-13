@@ -2,7 +2,10 @@
 var MenuItem=function(options) {
   this.text=""; // printed name
   this.icon=null;
-  this.action=null; // function for call, Menu for submenu
+  this.action=null; // function for call, Menu for submenu, string for property
+  this.prop_type=null;
+  this.prop_true_text="true";
+  this.prop_false_text="false";
   this.close=true;
   this.gap=false;
   
@@ -12,11 +15,19 @@ var MenuItem=function(options) {
     if("action" in options) this.action=options.action;
     if("gap" in options) this.gap=options.gap;
     if("close" in options) this.close=options.close;
+    if("prop_type" in options) this.prop_type=options.prop_type;
+    if("style" in options) {
+      var s=options.style.split("/");
+      this.prop_true_text=s[0];
+      this.prop_false_text=s[1];
+    }
   }
 
   this.type=function() {
     if(typeof this.action == typeof function(){}) {
       return "function";
+    } else if(typeof this.action == typeof "") {
+      return "prop";
     } else if(this.action == null) {
       return "disabled";
     } else {
@@ -29,6 +40,9 @@ var MenuItem=function(options) {
       this.action();
       if(this.close)
         menu_close("*");
+    } else if(this.type() == "prop") {
+      if(this.prop_type == "toggle")
+        prop_set(this.action,!prop_get(this.action));
     } else if(this.type() == "disabled") {
       return null;
     } else {
@@ -134,7 +148,10 @@ function menu_init() {
     title:"Settings",
     items:[
       new MenuItem({
-        text:"No settings yet.",
+        text:"Music",
+        style:"on/off",
+        prop_type:"toggle",
+        action:"prop.music.enabled"
       }),
     ]
   });

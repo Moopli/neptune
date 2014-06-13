@@ -25,23 +25,21 @@ var Player=Fiber.extend(function() {
         bottom:false
       };
 
-      this.location={
+      this.location={ // the OFFSET from player to wall
         left:0,
         right:0,
         top:0,
         bottom:0
       };
+
     },
     updateDirection:function() {
-      var temp=(this.direction[0]*this.max_speed[0]);
-      if(this.hit.left) temp=Math.max(0,temp);
-      if(this.hit.right) temp=Math.min(0,temp);
-      this.speed[0]+=temp;
-      if(this.hit.bottom && !this.hit.top) {
-        this.speed[1]=(clamp(0,this.direction[1],1)*this.jump_force);
-        if(this.direction[1] > ptiny) this.hit.bottom=false;
-      }
-//      this.speed[1]+=(this.direction[1]*this.max_speed[0]);
+      this.speed[0]+=clamp(left_closest,this.direction[0],right_closest);
+//      if(this.hit.bottom && !this.hit.top) {
+//        this.speed[1]=(clamp(0,this.direction[1],1)*this.jump_force);
+//        if(this.direction[1] > ptiny) this.hit.bottom=false;
+//      }
+      //      this.speed[1]+=(this.direction[1]*this.max_speed[0]);
       this.speed[0]=clamp(-this.max_speed[0],this.speed[0],this.max_speed[0]);
       this.speed[1]=clamp(-this.max_speed[1],this.speed[1],this.max_speed[1]);
     },
@@ -71,13 +69,12 @@ var Player=Fiber.extend(function() {
         map.getBottomPhysicsBlock(left_position,bottom_position),
         map.getBottomPhysicsBlock(center_position,bottom_position),
         map.getBottomPhysicsBlock(right_position,bottom_position));
-
       this.location.left=left_block_location;
       this.location.right=right_block_location;
       this.location.top=top_block_location;
       this.location.bottom=bottom_block_location;
     },
-    updateHorizontalCollision:function(margin,state) {
+    updateHorizontalCollision:function(margin) {
       if(this.location.left+margin > this.pos[0]-this.size[0]/4) {
         this.hit.left=true;
         this.pos[0]=this.location.left+this.size[0]/4;
@@ -90,7 +87,7 @@ var Player=Fiber.extend(function() {
         else this.pos[0]-=margin*1.01;
       }
     },
-    updateVerticalCollision:function(margin,state) {
+    updateVerticalCollision:function(margin) {
       if(this.location.top-margin < this.pos[1]+this.size[1]) {
         this.hit.top=true;
         this.pos[1]=this.location.top-this.size[1]-margin;
@@ -103,41 +100,40 @@ var Player=Fiber.extend(function() {
         else this.pos[1]+=margin*1.1;
       }
     },
-    updateCollision:function(state) {
+    updateCollision:function() {
 
       this.updateObstacles();
-      this.updateHorizontalCollision(0.08,state);
+      this.updateHorizontalCollision();
 
-//      this.updateObstacles();
-      this.updateVerticalCollision(0.04,state);
+      //      this.updateObstacles();
+      this.updateVerticalCollision();
 
     },
     updateGravity:function() {
-//      return;
+      //      return;
       if(this.hit.bottom) return;
       var map=map_current();
       this.speed[1]+=map.info.gravity*physics_delta();
     },
-    updatePhysics:function(state) {
-      this.updateGravity(state);
-      this.updateCollision(state);
-      this.updateFriction(state);
+    updatePhysics:function() {
+//      this.updateGravity();
+      this.updateCollision();
+      this.updateFriction();
     },
     updateFriction:function() {
       var friction=this.friction.ground;
       if(!this.hit.bottom)
         friction=this.friction.air;
       this.speed[0]-=this.speed[0]*(friction*physics_delta());
-//      this.speed[1]-=this.speed[1]*(18*physics_delta());
+      //      this.speed[1]-=this.speed[1]*(18*physics_delta());
     },
     updatePosition:function() {
       this.pos[0]+=this.speed[0]*physics_delta();
       this.pos[1]+=this.speed[1]*physics_delta();
     },
-    updateSubstep:function(state) {
-      this.updatePhysics(state);
-      this.updateDirection(state);
-      this.updatePosition(state);
+    updateSubstep:function() {
+      this.updatePhysics();
+      this.updatePosition();
     },
     update:function() {
       var i=0;
@@ -145,6 +141,7 @@ var Player=Fiber.extend(function() {
       this.hit.right=false;
       this.hit.top=false;
       this.hit.bottom=false;
+      this.updateDirection();
       while(i++<prop.game.substeps) {
         this.updateSubstep(false);
       }

@@ -31,7 +31,7 @@ var MODULES=[
 ];
 
 // saved as prop.version and prop.version_string
-var VERSION=[0,0,9];
+var VERSION=[0,1,0];
 
 // are you using a main loop? (you must call update() afterward disable/reenable)
 var UPDATE=true;
@@ -80,6 +80,14 @@ function prop_init() {
   prop.loaded=false;
   if(RELEASE)
     prop.log=LOG_WARNING;
+}
+
+function prop_get(key) {
+  return eval(key);
+}
+
+function prop_set(key,value) {
+  eval(key+"="+value);
 }
 
 // MISC (DEBUG)

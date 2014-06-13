@@ -101,7 +101,8 @@ function game_running() {
 }
 
 function game_update() {
-  prop.game.substeps=round(crange(0.01,delta(),0.1,20,30)*prop.game.speedup);
+  prop.game.substeps=round(crange(0.01,delta(),0.1,20,30)*prop.game.speedup)*4;
+  prop.temp=prop.game.substeps;
   prop.game.time+=game_delta();
 }
 
