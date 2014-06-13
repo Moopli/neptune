@@ -34,7 +34,8 @@ var Player=Fiber.extend(function() {
 
     },
     updateDirection:function() {
-      this.speed[0]+=clamp(left_closest,this.direction[0],right_closest);
+      this.speed[0]=this.direction[0]*15;
+      this.speed[1]=this.direction[1]*15;
 //      if(this.hit.bottom && !this.hit.top) {
 //        this.speed[1]=(clamp(0,this.direction[1],1)*this.jump_force);
 //        if(this.direction[1] > ptiny) this.hit.bottom=false;
@@ -101,8 +102,8 @@ var Player=Fiber.extend(function() {
       }
     },
     updateCollision:function() {
-
       this.updateObstacles();
+
       this.updateHorizontalCollision();
 
       //      this.updateObstacles();
@@ -117,7 +118,7 @@ var Player=Fiber.extend(function() {
     },
     updatePhysics:function() {
 //      this.updateGravity();
-      this.updateCollision();
+//      this.updateCollision();
       this.updateFriction();
     },
     updateFriction:function() {
