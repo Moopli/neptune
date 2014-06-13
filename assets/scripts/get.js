@@ -21,7 +21,7 @@ var Content=function(options) {
     this.type="string";
 
   this.getJSON=function() {
-//    log("Getting JSON file "+this.url+"...",LOG_DEBUG);
+    log("Getting JSON file "+this.url+"...",LOG_DEBUG);
     var that=this;
     $.getJSON(that.url)
       .done(that.dl_done)
@@ -29,14 +29,14 @@ var Content=function(options) {
   };
 
   this.getString=function() {
-//    log("Getting plain file "+this.url+"...",LOG_DEBUG);
+    log("Getting plain file "+this.url+"...",LOG_DEBUG);
     $.get(this.url)
       .done(this.dl_done)
       .fail(this.dl_fail);
   };
 
   this.getImage=function() {
-//    log("Getting image "+this.url+"...",LOG_DEBUG);
+    log("Getting image "+this.url+"...",LOG_DEBUG);
     this.data=new Image(this.url);
     this.data.onload=function() {
       var that=get_queue_current(); // we better be in a queue
@@ -58,7 +58,7 @@ var Content=function(options) {
   };
 
   this.getAudio=function() {
-//    log("Getting audio "+this.url+"...",LOG_DEBUG);
+    log("Getting audio "+this.url+"...",LOG_DEBUG);
     this.data=new Audio(this.url);
     this.dl_done(this.data);
   };
@@ -70,7 +70,7 @@ var Content=function(options) {
       return;
     }
     that.status="done";
-//    log("Downloaded "+that.url,LOG_DEBUG);
+    log("Downloaded "+that.url,LOG_DEBUG);
     if(that.callback)
       that.callback.call(that.that,"ok",data,that.payload);
     load_item_done();
