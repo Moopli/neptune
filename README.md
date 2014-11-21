@@ -1,6 +1,6 @@
 # Project Neptune
 
-Early 2014, a [soundtrack](http://evanpattison.bandcamp.com/album/neptune) appeared on reddit for a game that doesn't exist. This is a fork of an attempt to make Neptune something more than a soundtrack. All we're really starting with is an idea from Evan, the composer: "Neptune must traverse several treacherous environments and defeat the evil Dr. Musician to save the citizens of The City and his kidnapped love.". Everything else here so far will be my thoughts:
+Early 2014, a [soundtrack](http://evanpattison.bandcamp.com/album/neptune) appeared on [reddit](http://www.reddit.com/r/MakeMyGame/comments/1uij0a/well_theres_always_this/) for a game that doesn't exist. This is a fork of an attempt to make Neptune something more than a soundtrack. All we're really starting with is an idea from Evan, the composer: "Neptune must traverse several treacherous environments and defeat the evil Dr. Musician to save the citizens of The City and his kidnapped love.", and a bunch of working code from zlsa. Everything else here so far will be my thoughts:
 
 ## Plot
 
